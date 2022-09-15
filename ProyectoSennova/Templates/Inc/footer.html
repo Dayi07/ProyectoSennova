@@ -1,0 +1,29 @@
+{% load static %}
+
+<div class="sidenav-overlay"></div>
+<div class="drag-target"></div>
+<footer class="footer footer-static footer-light">
+    <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">COPYRIGHT &copy; 2022<a class="ms-25" href="https://investigacionctgi.com/" target="_blank">GIAITEQ</a><span class="d-none d-sm-inline-block">, SENNOVA CTGI</span></span></p>
+</footer>
+<button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button>
+<script src='{% static "vendors/js/vendors.min.js" %}'></script>
+<script src='{% static "js/core/app-menu.js" %}'></script>
+<script src='{% static "js/core/app.js" %}'></script>
+<script src='{% static "js/scripts/forms/form-tooltip-valid.js" %}'></script>
+<script>
+    $(window).on('load', function() {
+        if (feather) {
+            feather.replace({
+                width: 14,
+                height: 14
+            });
+        }
+    })
+</script>
+
+
+</div>
+</body>
+</html>
+
+
