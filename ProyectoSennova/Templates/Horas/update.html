@@ -1,0 +1,88 @@
+{% include 'Inc/header.html' %}
+                        <h2 class="content-header-title float-start mb-0">Horas</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/horas">Listado</a>
+                                </li>
+                                <li class="breadcrumb-item"><a href=" ">Actualizar</a>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <div class="mb-1 breadcrumb-right">
+                    <div class="dropdown">
+                        <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="grid"></i></button>
+                        <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#"><i class="me-1" data-feather="check-square"></i><span class="align-middle">Todo</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="message-square"></i><span class="align-middle">Chat</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="mail"></i><span class="align-middle">Email</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="calendar"></i><span class="align-middle">Calendar</span></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+<section id="basic-input" class="tootip-validations">            
+    <div class="content-body">
+        <form class="needs-validation" action=" " method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                 <div class="card-header">
+                     <h4 class="card-title">Actualizar Horas</h4>
+                 </div>
+                 <div class="card-body">
+                     <div class="row">
+                         <div class="col-xl-4 col-md-6 col-12">
+                             <div class="mb-1">
+                                 <label class="form-label" for="HORAS_Monitores">Ingrese horas de monitores:</label>
+                                 <input type="text" class="form-control" id="HORAS_Monitores" name="HORAS_Monitores" value="{{ horas.HORAS_Monitores }}"  required/>
+                                 <div class="invalid-tooltip">Las horas de monitores son obligatorias.</div>
+                             </div>
+                         </div>
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="HORAS_Inst_Empresa">Ingrese horas de empresa:</label>
+                                <input type="number" class="form-control" id="HORAS_Inst_Empresa" name="HORAS_Inst_Empresa" value="{{ horas.HORAS_Inst_Empresa }}"  required/>
+                                <div class="invalid-tooltip">Las horas de empresa son obligatorias.</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="HORAS_Contratista_Externos">Ingrese horas de contratista externo:</label>
+                                <input type="number" class="form-control" id="HORAS_Contratista_Externos" name="HORAS_Contratista_Externos" value="{{ horas.HORAS_Contratista_Externos }}"  required/>
+                                <div class="invalid-tooltip">Las horas de contratistas son obligatorias.</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="HORAS_Planta">Ingrese horas planta:</label>
+                                <input type="number" class="form-control" id="HORAS_Planta" name="HORAS_Planta" value="{{ horas.HORAS_Planta }}"  required/>
+                                <div class="invalid-tooltip">Las horas planta son obligatorias.</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="HORAS_Total">Ingrese total de horas:</label>
+                                <input type="number" class="form-control" id="HORAS_Total" name="HORAS_Total" value="{{ horas.HORAS_Total }}"  required/>
+                                <div class="invalid-tooltip">El total de horas son obligatorias.</div>
+                            </div>
+                        </div>
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="ocupacion">Seleccione ocupacion:</label>
+                                <select class="form-select" aria-label="Default select example" name="ocupacion" id="ocupacion" required>
+                                    <option value="{{ horas.ocupacion.id }}">{{ horas.ocupacion.OCUPA_Nombre }}</option>
+                                    {% for item in ocupacion %}
+                                    <option value="{{ item.id }}">{{ item.OCUPA_Nombre }}</option>
+                                    {% endfor %}
+                                </select>                             
+                                <div class="invalid-tooltip">La ocupacion es obligatoria.</div>
+                            </div>
+                         </div> 
+                     </div>
+                     <button class="btn btn-primary" type="submit">Guardar</button>
+                 </div>
+             </div>
+        </form>
+    </div>
+
+{% include 'Inc/footer.html' %}

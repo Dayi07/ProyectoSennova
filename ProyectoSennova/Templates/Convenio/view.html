@@ -1,23 +1,14 @@
 {% include 'Inc/header.html' %}
 
-
-<div class="app-content content ">
-    <div class="content-overlay"></div>
-    <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper container-xxl p-0"> 
-        <div class="content-header row">
-            <div class="content-header-left col-md-9 col-12 mb-2">
-                <div class="row breadcrumbs-top">
-                    <div class="col-12">
-                      <h2 class="content-header-title float-start mb-0">Jornada</h2>
+                      <h2 class="content-header-title float-start mb-0">Convenios</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href=" ">Listado</a>
+                                    <li class="breadcrumb-item"><a href="/convenio/">Listado</a>
                                     </li>
-                                    <li class="breadcrumb-item"><a href=" ">Insertar</a>
+                                    <li class="breadcrumb-item"><a href="/convenio/insert/ ">Insertar</a>
                                     </li>                   
                                 </ol>
-                            </div>
+                          </div>
                     </div>
                 </div>
             </div>
@@ -31,7 +22,6 @@
             </div>
         </div>
         <div class="content-body">
-            <!-- Basic table -->
             <section id="basic-datatable">
                 <div class="row">
                     <div class="col-12">
@@ -41,22 +31,58 @@
                                     <tr>
                                         <th></th>
                                         <th>Nombre</th>
+                                        <th>Covertura</th>
+                                        <th>Sector</th>
+                                        <th>Empresa</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
+                                {% for item in convenio %}
+                                <tr>
+                                    <td></td>
+                                    <td>{{ item.CONVE_Nombre }}</td>
+                                    <td>{{ item.CONVE_Ampliacion_Cobertura }}</td>
+                                    <td>{{ item.sector.SECTO_Nombre }}</td>
+                                    <td>{{ item.empresa.EMPRE_Nombre }}</td>
+                                    <td>
+                                      <a onclick="borrar('{{item.id}}')">E</a>
+                                      <a href="{% url 'updateConvenio' item.id %}">A</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </table>
                         </div>
                     </div>
                 </div>
-                <!-- Modal to add new record -->
             </section>
-            <!--/ Basic table -->
 
+{% include 'Inc/footer.html' %}
 
-        </div>
-        
-    </div>
-</div>
+<script>
+    function borrar(id){   
+    swal({
+            title: "¿Estas seguro de eliminar?",
+            text: "Si eliminas este elemento no podra ser recuperado",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            
+        .then((willDelete) => {
+                       
+            if (willDelete) {
+                var url2 = "delete/" + id;
+                url2 = url2.replace('id', id);
+                location.href = url2;   
 
-
-{% include 'Inc/Footer.html' %}
+            
+                swal("Poof! El elemento fue eliminado!", {
+                icon: "success",
+                });    
+            
+            } else {
+                swal("El elemento no se elimino");
+            }
+        });   
+    }   
+</script>

@@ -1,0 +1,112 @@
+{% include 'Inc/header.html' %}
+
+                        <h2 class="content-header-title float-start mb-0">Curso</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/curso/ ">Listado</a>
+                                </li>
+                                <li class="breadcrumb-item"><a href= "">Actualizar</a>
+                                </li> 
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <div class="mb-1 breadcrumb-right">
+                    <div class="dropdown">
+                        <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="grid"></i></button>
+                        <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#"><i class="me-1" data-feather="check-square"></i><span class="align-middle">Todo</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="message-square"></i><span class="align-middle">Chat</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="mail"></i><span class="align-middle">Email</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="calendar"></i><span class="align-middle">Calendar</span></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<section id="basic-input" class="tootip-validations">        
+    <div class="content-body">
+        <form class="needs-validation" action=" " method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                 <div class="card-header">
+                     <h4 class="card-title">Actualizar Curso</h4>
+                 </div>
+                 <div class="card-body">
+                     <div class="row">
+                         <div class="col-xl-4 col-md-6 col-12">
+                             <div class="mb-1">
+                                 <label class="form-label" for="CURSO_Numero">Ingrese numero del curso:</label>
+                                 <input type="numbre" class="form-control" id="CURSO_Numero" name="CURSO_Numero" value="{{ curso.CURSO_Numero }}"  required/>
+                                 <div class="invalid-tooltip">El numero es obligatorio.</div>
+                             </div>
+                         </div>  
+
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CURSO_Nombre">Ingrese nombre del curso:</label>
+                                <input type="text" class="form-control" id="CURSO_Nombre" name="CURSO_Nombre" value="{{ curso.CURSO_Nombre }}"  required/>
+                                <div class="invalid-tooltip">El nombre es obligatorio.</div>
+                            </div>
+                        </div> 
+
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CURSO_Estado">Ingrese estado del curso:</label>
+                                <input type="text" class="form-control" id="CURSO_Estado" name="CURSO_Estado" value="{{ curso.CURSO_Estado }}"  required/>
+                                <div class="invalid-tooltip">El estado es obligatorio.</div>
+                            </div>
+                        </div> 
+
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CURSO_Tipo">Ingrese tipo del curso:</label>
+                                <input type="text" class="form-control" id="CURSO_Tipo" name="CURSO_Tipo" value="{{ curso.CURSO_Tipo }}"  required/>
+                                <div class="invalid-tooltip">El tipo es obligatorio.</div>
+                            </div>
+                        </div> 
+
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="jornada">Seleccione nombre del jornada:</label>
+                                <select class="form-select" aria-label="Default select example" name="jornada" id="jornada" required>
+                                    <option value="{{ curso.jornada.id }}">{{ curso.jornada.JORNA_Nombre }}</option>
+                                    {% for item in jornada %}
+                                    <option value="{{ item.id }}">{{ item.JORNA_Nombre }}</option>
+                                    {% endfor %}
+                                </select>                             
+                                <div class="invalid-tooltip">La jornada es obligatoria.</div>
+                            </div>
+                         </div> 
+
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="sector">Seleccione nombre del sector:</label>
+                                <select class="form-select" aria-label="Default select example" name="sector" id="sector" required>
+                                    <option value="{{ curso.sector.id }}">{{ curso.sector.SECTO_Nombre }}</option>
+                                    {% for item in sector %}
+                                    <option value="{{ item.id }}">{{ item.SECTO_Nombre }}</option>
+                                    {% endfor %}
+                                </select>                             
+                                <div class="invalid-tooltip">El sector es obligatorio.</div>
+                            </div>
+                         </div>
+                         
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="municipiocurso">Seleccione nombre del municipio:</label>
+                                <select class="form-select" aria-label="Default select example" name="municipiocurso" id="municipiocurso" required>
+                                    <option value="{{ curso.municipiocurso.id }}">{{ curso.municipiocurso.MUNIC_Nombre }}</option>
+                                    {% for item in municipio %}
+                                    <option value="{{ item.id }}">{{ item.MUNIC_Nombre }}</option>
+                                    {% endfor %}
+                                </select>                             
+                                <div class="invalid-tooltip">El municipio es obligatorio.</div>
+                            </div>
+                         </div>
+                     </div>
+                     <button class="btn btn-primary" type="submit">Guardar</button>
+                 </div>
+             </div>
+        </form>
+    </div>
+</section>
+{% include 'Inc/footer.html' %}
