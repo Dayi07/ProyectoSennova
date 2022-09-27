@@ -37,14 +37,16 @@ def insertpais(request):
 
 
 def resuljson(request):
-    data = list(PaisCurso.objects.values())
-    return JsonResponse({'data' : data}, safe=False)
+    data = list(PaisCurso.objects.values())   
+    return JsonResponse({'data' : data})
+    
 
-
+  
 def deletepais(request, id):
     pais = PaisCurso.objects.get(id = id)
     pais.delete()
     return redirect('/pais')
+
 
 @csrf_exempt
 def viewUpdatePais(request, id):
@@ -865,7 +867,7 @@ def viewUpdateFicha(request, id):
 #region APRENDIZ
 
 def insertAprendiz(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.FILES['APREN_Foto']:
             aprendiz = Aprendiz(
                 APREN_Nombre = request.POST['APREN_Nombre'],
                 APREN_Apellido = request.POST['APREN_Apellido'],
@@ -874,6 +876,7 @@ def insertAprendiz(request):
                 APREN_Celular = request.POST['APREN_Celular'],
                 APREN_Estado = request.POST['APREN_Estado'],
                 APREN_Correo = request.POST['APREN_Correo'],
+                APREN_Foto = request.FILES['APREN_Foto'],
                 ficha = Ficha.objects.get(id = request.POST['ficha']),
                 ) 
             aprendiz.save()
@@ -912,6 +915,7 @@ def viewUpdateAprendiz(request, id):
         aprendiz.APREN_Estado = request.POST.get('APREN_Estado')
         aprendiz.APREN_Correo = request.POST.get('APREN_Correo')
         aprendiz.ficha = Ficha.objects.get(id = request.POST['ficha'])
+        aprendiz.APREN_Foto = request.POST.get('APREN_Foto')
         aprendiz.save()
         return redirect('/aprendiz')
     else:

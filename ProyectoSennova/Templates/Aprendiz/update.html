@@ -75,7 +75,7 @@
                         <div class="col-xl-4 col-md-6 col-12">
                             <div class="mb-1">
                                 <label class="form-label" for="APREN_Correo">Ingrese correo electronico:</label>
-                                <input type="email" class="form-control" id="APREN_Correo" name="APREN_Correo"  required/>
+                                <input type="email" class="form-control" id="APREN_Correo" name="APREN_Correo"  value="{{ aprendiz.APREN_Correo }}" required/>
                                 <div class="invalid-tooltip">El correo es obligatorio.</div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                             <div class="mb-1">
                                 <label class="form-label" for="ficha">Seleccione ficha:</label>
                                 <select class="form-select" aria-label="Default select example" name="ficha" id="ficha" required>
-                                    <option value="{{ aprendiz.ficha.FICHA_Identificador_Unico }}">{{ aprendiz.ficha.FICHA_Identificador_Unico }}</option>
+                                    <option value="{{ aprendiz.ficha.id }}">{{ aprendiz.ficha.FICHA_Identificador_Unico }}</option>
                                     {% for item in ficha %}
                                     <option value="{{ item.id }}">{{ item.FICHA_Identificador_Unico }}</option>
                                     {% endfor %}
@@ -103,6 +103,11 @@
                                 <div class="invalid-tooltip">La ficha es obligatoria.</div>                           
                             </div>
                          </div> 
+
+                         <div class="col-lg-6 col-md-12 mb-1 mb-sm-0">
+                            <input type="hidden" name="APREN_Foto" id="APREN_Foto" value="{{ aprendiz.APREN_Foto }}">
+                        </div> 
+
                      </div>
                      <button class="btn btn-primary" type="submit">Guardar</button>
                  </div>

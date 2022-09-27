@@ -14,7 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path
+from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
 from ProyectoSennova.views import viewUpdatePais, viewpais, insertpais, resuljson, deletepais                                           #PAIS
@@ -41,90 +42,86 @@ urlpatterns = [
     path('pais/', viewpais),
     path('pais/insert/', insertpais),
     path('pais/json/', resuljson, name='jsonpais'),
-    path('pais/delete/<int:id>', deletepais),
+    path('pais/delete/<int:id>', deletepais, name='deletepais'),
     path('pais/update/<int:id>', viewUpdatePais, name='viewUpdatePais'),
 
     path('departamento/insert/', insertDepartamento),
     path('departamento/', viewDepartamento),
-    path('departamento/delete/<int:id>', deleteDepartamento),
+    path('departamento/delete/<int:id>', deleteDepartamento, name='deleteDepartamento'),
     path('departamento/update/<int:id>', viewUpdateDepartamento, name='updateDepartamento'),
 
     path('regional/insert', insertRegional),
     path('regional/', viewRegional),
-    path('regional/delete/<int:id>', deleteRegional),
+    path('regional/delete/<int:id>', deleteRegional, name='deleteRegional'),
     path('regional/update/<int:id>', viewUpdateRegional, name='updateRegional'),
 
     path('sector/insert', insertSector),
     path('sector/', viewSector),
-    path('sector/delete/<int:id>', deleteSector),
+    path('sector/delete/<int:id>', deleteSector, name='deleteSector'),
     path('sector/update/<int:id>', viewUpdateSector, name='updateSector'),
 
     path('jornada', viewJornada),
     path('jornada/insert/', insertJornada),
-    path('jornada/delete/<int:id>', deleteJornada),
+    path('jornada/delete/<int:id>', deleteJornada, name='deleteJornada'),
     path('jornada/update/<int:id>', viewUpdateJornada, name='updateJornada'),
 
     path('empresa/insert/', insertEmpresa),
     path('empresa/', viewEmpresa),
-    path('empresa/delete/<int:id>', deleteEmpresa),
+    path('empresa/delete/<int:id>', deleteEmpresa, name='deleteEmpresa'),
     path('empresa/update/<int:id>', viewUpdateEmpresa, name='updateEmpresa'),
 
     path('municipio/insert/', insertMunicipio),
     path('municipio/', viewMunicipio),
-    path('municipio/delete/<int:id>', deleteMunicipio),
+    path('municipio/delete/<int:id>', deleteMunicipio, name='deleteMunicipio'),
     path('municipio/update/<int:id>', viewUpdateMunicipio, name='updateMunicipio'),
 
     path('centro/insert/', insertCentro),
     path('centro/', viewCentro),
-    path('centro/delete/<int:id>', deleteCentro),
+    path('centro/delete/<int:id>', deleteCentro, name='deleteCentro'),
     path('centro/update/<int:id>', viewUpdateCentro, name='updateCentro'),
 
     path('ocupacion/insert/', insertOcupacion),
     path('ocupacion/', viewOcupacion),
-    path('ocupacion/delete/<int:id>', deleteOcupacion),
+    path('ocupacion/delete/<int:id>', deleteOcupacion, name='deleteOcupacion'),
     path('ocupacion/update/<int:id>', viewUpdateOcupacion, name='updateOcupacion'),
 
     path('convenio/insert/', insertConvenio),
     path('convenio/', viewConvenio),
-    path('convenio/delete/<int:id>', deleteConvenio),
+    path('convenio/delete/<int:id>', deleteConvenio, name='deleteConvenio'),
     path('convenio/update/<int:id>', viewUpdateConvenio, name='updateConvenio'),
 
     path('curso/insert/', insertCurso),
     path('curso/', viewCurso),
-    path('curso/delete/<int:id>', deleteCurso),
+    path('curso/delete/<int:id>', deleteCurso, name='deleteCurso'),
     path('cursos/update/<int:id>', viewUpdateCurso, name='updateCurso'),
 
     path('horas/insert/', insertHora),
     path('horas/', viewHora),
-    path('horas/delete/<int:id>', deleteHora),
+    path('horas/delete/<int:id>', deleteHora, name='deleteHora'),
     path('horas/update/<int:id>', viewUpdateHoras, name='updateHoras'),
 
     path('programaesp/insert/', insertProgEsp),
     path('programaesp/', viewProgEsp),
-    path('programaesp/delete/<int:id>', deleteProgEsp),
+    path('programaesp/delete/<int:id>', deleteProgEsp, name='deleteProgEsp'),
     path('programaesp/update/<int:id>', viewUpdateProgEsp, name='updateProgramaEsp'),
 
     path('programafor/insert/', insertProgFor),
     path('programafor/', viewProgFor),
-    path('programafor/delete/<int:id>', deleteProgFor),
+    path('programafor/delete/<int:id>', deleteProgFor, name='deleteProgFor'),
     path('programafor/update/<int:id>', viewUpdateProgFor, name='updateProgramaFor'),
 
     path('ficha/insert/', insertFicha),
     path('ficha/', viewFicha),
-    path('ficha/delete/<int:id>', deleteFicha),
+    path('ficha/delete/<int:id>', deleteFicha, name='deleteFicha'),
     path('ficha/update/<int:id>', viewUpdateFicha, name='updateFicha'),
 
     path('aprendiz/insert/', insertAprendiz),
     path('aprendiz/', viewAprendiz),
-    path('aprendiz/delete/<int:id>', deleteAprendiz),
+    path('aprendiz/delete/<int:id>', deleteAprendiz, name='deleteAprendiz'),
     path('aprendiz/update/<int:id>', viewUpdateAprendiz, name='updateAprendiz'),
 
 ] 
 
 
-urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {
-        'PROGR_URL' : settings.MEDIA_ROOT,
-    })
-    ] 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     

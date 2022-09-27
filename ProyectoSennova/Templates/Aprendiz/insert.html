@@ -23,7 +23,7 @@
     </div>
 <section id="basic-input" class="tootip-validations">     
     <div class="content-body">
-        <form class="needs-validation" method="POST" action=" " novalidate>
+        <form class="needs-validation" method="POST" action=" " enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             <div class="card">
                  <div class="card-header">
@@ -98,6 +98,14 @@
                                     {% endfor %}
                                 </select>  
                                 <div class="invalid-tooltip">La ficha es obligatoria.</div>                           
+                            </div>
+                         </div> 
+
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label for="APREN_Foto" class="form-label">Foto del aprendiz:</label>
+                                <input class="form-control" type="file" name="APREN_Foto" id="APREN_Foto" accept=".jpg" required/>
+                                <div class="invalid-tooltip">La foto es obligatoria.</div>                               
                             </div>
                          </div> 
                      </div>

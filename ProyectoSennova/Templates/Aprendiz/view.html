@@ -30,6 +30,7 @@
                                 <thead>
                                     <tr>
                                         <th></th>
+                                        <th>Foto</th>
                                         <th>Nombre</th>
                                         <th>Documento</th>
                                         <th>Celular</th>
@@ -43,6 +44,7 @@
                                     {% for item in aprendiz %}
                                       <tr>
                                           <td></td>
+                                          <td> <img src="/media/{{ item.APREN_Foto }}" class="round" width="40px" height="40px"></td>
                                           <td>{{ item.APREN_Nombre }} {{ item.APREN_Apellido }}</td>
                                           <td>{{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }}</td>
                                           <td>{{ item.APREN_Celular }}</td>

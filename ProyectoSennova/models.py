@@ -199,6 +199,7 @@ class Aprendiz(models.Model):
     APREN_Celular = models.CharField(max_length=50)
     APREN_Estado = models.CharField(max_length=50)
     APREN_Correo = models.CharField(max_length=50)
+    APREN_Foto = models.ImageField(upload_to='Aprendiz/', blank=True, null=True)
     ficha = models.ForeignKey(
         Ficha, 
         on_delete = models.CASCADE

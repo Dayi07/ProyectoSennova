@@ -73,6 +73,7 @@
 </script>
   
 <script>
+
       $(function () {
         'use strict';
       
@@ -83,17 +84,17 @@
           dt_multilingual_table = $('.dt-multilingual'),
           assetPath = 'app-assets/';
       
-        if ($('body').attr('data-framework') === 'laravel') {
+        if ($('body').attr('data-framework') === 'django') {
           assetPath = $('body').attr('data-asset-path');
         }
       
         if (dt_basic_table.length) {
           var dt_basic = dt_basic_table.DataTable({
-            ajax: "/pais/json/",
+            ajax: "{% url 'jsonpais' %}",
             columns: [
                   { data: 'id' },
                   { data: 'PAISC_Nombre' },
-                  { data: 'Acciones' },
+                  { data: 'Acciones' }, 
                 ],
             columnDefs: [
               {
@@ -109,11 +110,11 @@
                 title: 'Actions',
                 orderable: false,
                 render: function (data, type, full, meta) {
-  
+                  alert(data)
                   var id = full ['id'];
-                  var url = ' ';
+                  var url = " ";
                   url = url.replace('id', id);
-                  var url2 = ' ';
+                  var url2 = " ";
                   url2 = url2.replace('id', id);
   
   

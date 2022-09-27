@@ -42,7 +42,8 @@
                                     <td>{{ item.MUNIC_Nombre }}</td>
                                     <td>{{ item.departamentocurso.DEPAR_Nombre }}</td>
                                     <td>
-                                      <a onclick="borrar('{{item.id}}')">el</a>
+                                        <a onclick="borrar('{{item.id}}')">E</a>
+                                        <a href="{% url 'updateMunicipio' item.id %}"> A</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
