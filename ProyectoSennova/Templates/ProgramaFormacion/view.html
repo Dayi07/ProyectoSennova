@@ -57,6 +57,7 @@
                                         <td>
                                           <a onclick="borrar('{{item.id}}')">E</a>
                                           <a href="{% url 'updateProgramaFor' item.id %}">A</a>
+                                          <a href="{% url 'UpdateFileProgFor' item.id %}">F</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

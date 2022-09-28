@@ -791,6 +791,32 @@ def viewUpdateProgFor(request, id):
         parametros = Context({'programa' : programa, 'sector' : sector})
         paginalistado = leer.render(parametros)
         return HttpResponse(paginalistado)
+
+
+@csrf_exempt
+def viewUpdateFileProgFor(request, id):
+    if request.method == "POST":
+        programa = ProgramaFormacion(id = id)
+        programa.PROGR_Nombre = request.POST.get('PROGR_Nombre')
+        programa.PROGR_Modalidad = request.POST.get('PROGR_Modalidad')
+        programa.PROGR_Tipo_Formacion = request.POST.get('PROGR_Tipo_Formacion')
+        programa.PROGR_Duracion = request.POST.get('PROGR_Duracion')
+        programa.PROGR_Version = request.POST.get('PROGR_Version')
+        programa.PROGR_Nivel = request.POST.get('PROGR_Nivel')
+        programa.PROGR_URL = request.FILES.get('PROGR_URL')
+        programa.sector = Sector.objects.get(id = request.POST['sector'])
+        programa.save()
+        return redirect('/programafor')
+    else:
+        programa = ProgramaFormacion.objects.get(id = id)
+        sector = Sector.objects.all()
+        archivo = open("ProyectoSennova/Templates/ProgramaFormacion/updateFile.html")
+        leer = Template(archivo.read())
+        archivo.close
+        parametros = Context({'programa' : programa, 'sector' : sector})
+        paginalistado = leer.render(parametros)
+        return HttpResponse(paginalistado)
+
 #endregion
 
 
