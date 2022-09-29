@@ -1,14 +1,19 @@
 from cgi import FieldStorage
 from distutils.command.upload import upload
 from contextvars import Context
+import encodings
+import imp
+from unicodedata import name
 from django.http import HttpResponse, JsonResponse
 import json
 from django.template import Template, Context
-from ProyectoSennova.models import Aprendiz, Centro, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
+from ProyectoSennova.models import Aprendiz, Centro, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
 from django.shortcuts import render, redirect
 from django.core.files.storage  import FileSystemStorage
 from django.contrib import messages
 from django.db import connection
+import pandas as pd      
+#from sqlalchemy import create_engine
 from django.views.decorators.csrf import csrf_exempt
 
 #region PAIS CURSO
@@ -954,4 +959,19 @@ def viewUpdateAprendiz(request, id):
         paginalistado = leer.render(parametros)
         return HttpResponse(paginalistado)
 
-#endregion
+
+def importarAprendiz(request):
+    if request.method == "POST" :
+        doc = Importar()
+        doc.importar = request.FILES.get('importar')
+        doc.save()
+
+        datos = pd.ExcelFile('http://127.0.0.1:8000/media/Importar/Reporte.xlsx').parse(sheet_name=0, header=4, names={'APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado' }, index_col=None, encoding = 'latin-1')
+        print( datos.head(10))
+
+        datos.to_sql(name = 'Aprendiz', con = 'openpyxl', if_exists = 'append')
+
+        return redirect('/aprendiz')  
+    else:
+        return render(request, 'aprendiz/import.html')
+#endregion 
