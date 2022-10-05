@@ -200,7 +200,6 @@ class Aprendiz(models.Model):
     APREN_Estado = models.CharField(max_length=50)
     APREN_Correo = models.CharField(max_length=50)
     APREN_Foto = models.ImageField(upload_to='Aprendiz/', blank=True, null=True)
-    importar = models.FileField(upload_to='Importar/', blank=True, null=True)
     ficha = models.ForeignKey(
         Ficha, 
         on_delete = models.CASCADE

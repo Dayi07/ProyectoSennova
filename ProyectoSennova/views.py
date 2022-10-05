@@ -1,20 +1,29 @@
+from ast import For
 from cgi import FieldStorage
 from distutils.command.upload import upload
 from contextvars import Context
 import encodings
 import imp
+import tkinter
 from unicodedata import name
 from django.http import HttpResponse, JsonResponse
 import json
 from django.template import Template, Context
+import sqlalchemy
 from ProyectoSennova.models import Aprendiz, Centro, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
 from django.shortcuts import render, redirect
 from django.core.files.storage  import FileSystemStorage
 from django.contrib import messages
 from django.db import connection
-import pandas as pd      
-#from sqlalchemy import create_engine
+import pandas as pd   
+from flask_sqlalchemy import SQLAlchemy    
+from sqlalchemy import create_engine
 from django.views.decorators.csrf import csrf_exempt
+from shutil import rmtree
+import re
+from tkinter import *
+from tkinter import messagebox
+
 
 #region PAIS CURSO
 def viewpais(request):
@@ -966,12 +975,55 @@ def importarAprendiz(request):
         doc.importar = request.FILES.get('importar')
         doc.save()
 
-        datos = pd.ExcelFile('http://127.0.0.1:8000/media/Importar/Reporte.xlsx').parse(sheet_name=0, header=4, names={'APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado' }, index_col=None, encoding = 'latin-1')
-        print( datos.head(10))
+        archivo = str(doc.importar)
+        url = 'http://127.0.0.1:8000/media/'+archivo
+        print('uuuuurrrrrrrrrrlllllllll', url)
 
-        datos.to_sql(name = 'Aprendiz', con = 'openpyxl', if_exists = 'append')
+        engine = create_engine('mysql://root:sena1234@localhost/ProyectoSennova')
 
-        return redirect('/aprendiz')  
+        #datos = pd.ExcelFile('http://127.0.0.1:8000/media/Importar/Reporte.xlsx').parse(sheet_name=0, header=4, names={'APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado' }, index_col=None, encoding = 'latin-1')
+        #datos = pd.read_excel(io = 'http://127.0.0.1:8000/media/Importar/Reporte.xlsx')
+        
+        try:
+            datos = pd.read_excel(io = url, sheet_name=0, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
+            datos2 = pd.read_excel(io = url, sheet_name=0, header=4, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
+            
+            #print("datos",datos.head(10))
+            #print(datos.iloc[4:])
+
+            busq = datos.loc[0,'APREN_Nombre']
+            busq.split()
+            ficha = re.split(r'\s+', busq)
+
+            ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = ficha[0])
+            #print("Ficha:", ficha_def)
+
+            datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
+            #datos2['ficha_id'] = ficha_def
+            lista = []
+
+            for i in range(0, len(datos2)):
+                num = datos2.iloc[i]['APREN_Documento']
+
+                try:
+                    if Aprendiz.objects.get(APREN_Documento = num):
+                        #print('documento duplicado', num)
+                        lista.append(i)
+                        #print('indice:', i)
+                except:
+                    continue             
+
+            #print(lista)
+            #print(datos2)  
+            datos_completos = datos2.drop(lista, axis=0)
+            rmtree("/ProyectoSennova/media/Importar")
+            datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
+            print('finalizo')
+        except:
+            return redirect('/aprendiz')  
     else:
         return render(request, 'aprendiz/import.html')
+
+
 #endregion 
+
