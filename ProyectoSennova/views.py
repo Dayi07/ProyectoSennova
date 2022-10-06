@@ -1,10 +1,8 @@
 from ast import For
 from cgi import FieldStorage
-from distutils.command.upload import upload
 from contextvars import Context
 import encodings
 import imp
-import tkinter
 from unicodedata import name
 from django.http import HttpResponse, JsonResponse
 import json
@@ -21,8 +19,6 @@ from sqlalchemy import create_engine
 from django.views.decorators.csrf import csrf_exempt
 from shutil import rmtree
 import re
-from tkinter import *
-from tkinter import messagebox
 
 
 #region PAIS CURSO
@@ -918,7 +914,7 @@ def insertAprendiz(request):
                 APREN_Correo = request.POST['APREN_Correo'],
                 APREN_Foto = request.FILES['APREN_Foto'],
                 ficha = Ficha.objects.get(id = request.POST['ficha']),
-                ) 
+                )  
             aprendiz.save()
             return redirect('/aprendiz/')
     else:
@@ -968,62 +964,88 @@ def viewUpdateAprendiz(request, id):
         paginalistado = leer.render(parametros)
         return HttpResponse(paginalistado)
 
+@csrf_exempt
+def updateFotoAprendiz(request, id):
+    if request.method == "POST" and request.FILES['APREN_Foto']:
+        aprendiz = Aprendiz(id = id)
+        aprendiz.APREN_Nombre = request.POST.get('APREN_Nombre')
+        aprendiz.APREN_Apellido = request.POST.get('APREN_Apellido')
+        aprendiz.APREN_Documento = request.POST.get('APREN_Documento')
+        aprendiz.APREN_Tipo_Documento = request.POST.get('APREN_Tipo_Documento')
+        aprendiz.APREN_Celular = request.POST.get('APREN_Celular')
+        aprendiz.APREN_Estado = request.POST.get('APREN_Estado')
+        aprendiz.APREN_Correo = request.POST.get('APREN_Correo')
+        aprendiz.APREN_Foto = request.FILES.get('APREN_Foto')
+        aprendiz.ficha = Ficha.objects.get(id = request.POST['ficha'])
+        aprendiz.save()
+        return redirect('/aprendiz')
+    else:
+        aprendiz = Aprendiz.objects.get(id = id)
+        ficha = Ficha.objects.all()
+        archivo = open("ProyectoSennova/Templates/Aprendiz/updateFoto.html")
+        leer = Template(archivo.read())
+        archivo.close
+        parametros = Context({'aprendiz' : aprendiz, 'ficha' : ficha})
+        paginalistado = leer.render(parametros)
+        return HttpResponse(paginalistado)
 
 def importarAprendiz(request):
+    #Se guarda el archivo para su lectura
     if request.method == "POST" :
         doc = Importar()
         doc.importar = request.FILES.get('importar')
         doc.save()
 
+        #Se crea la URL de lectura con el nombre del archivo
         archivo = str(doc.importar)
         url = 'http://127.0.0.1:8000/media/'+archivo
-        print('uuuuurrrrrrrrrrlllllllll', url)
 
+        #Se cre el engine(motor) con las especificaiones de la Base de Datos
         engine = create_engine('mysql://root:sena1234@localhost/ProyectoSennova')
 
-        #datos = pd.ExcelFile('http://127.0.0.1:8000/media/Importar/Reporte.xlsx').parse(sheet_name=0, header=4, names={'APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado' }, index_col=None, encoding = 'latin-1')
-        #datos = pd.read_excel(io = 'http://127.0.0.1:8000/media/Importar/Reporte.xlsx')
-        
         try:
+            #Se hacen dos lecturas del documento excel
+            #Uno con el documento completo para la captura de la Ficha
             datos = pd.read_excel(io = url, sheet_name=0, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
+            #Otra con solo los datos de la tabla
             datos2 = pd.read_excel(io = url, sheet_name=0, header=4, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
             
-            #print("datos",datos.head(10))
-            #print(datos.iloc[4:])
-
+            #Se hace la busqueda de la Ficha y se usa split para separar las demas palabras
             busq = datos.loc[0,'APREN_Nombre']
             busq.split()
             ficha = re.split(r'\s+', busq)
 
+            #Se busca en la clase la Ficha capturada
             ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = ficha[0])
-            #print("Ficha:", ficha_def)
 
+            #Se inserta una nueva columna con el Id de la Ficha
             datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
-            #datos2['ficha_id'] = ficha_def
+
+            #Se crea una lista para almacenar los indices con datos duplicados (Que ya estan en la Base de Datos)            
             lista = []
-
             for i in range(0, len(datos2)):
+                #Se recorre la columna del Documento
                 num = datos2.iloc[i]['APREN_Documento']
-
                 try:
+                    #Se busca si esta en la Base de Datos y se agrega el indice a la lista 
                     if Aprendiz.objects.get(APREN_Documento = num):
-                        #print('documento duplicado', num)
                         lista.append(i)
-                        #print('indice:', i)
                 except:
                     continue             
 
-            #print(lista)
-            #print(datos2)  
+            #Se borran las filas por medio de sus indices y se guarda en un nuevo DataFrame
             datos_completos = datos2.drop(lista, axis=0)
-            rmtree("/ProyectoSennova/media/Importar")
+            
+            #Se borra la carpeta donde se encuentra el Excel debido a que ya hizo la lectura
+            rmtree("/ProyectoSennova/media/Importar")  
+
+            #Se guardan los datos del DataFrame en la Base de Datos          
             datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
-            print('finalizo')
+
         except:
             return redirect('/aprendiz')  
     else:
         return render(request, 'aprendiz/import.html')
-
 
 #endregion 
 

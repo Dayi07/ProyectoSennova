@@ -18,22 +18,22 @@ from django.urls import path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.static import serve
-from ProyectoSennova.views import viewUpdatePais, viewpais, insertpais, resuljson, deletepais                                           #PAIS
-from ProyectoSennova.views import insertDepartamento, viewDepartamento, deleteDepartamento, viewUpdateDepartamento                      #DEPARTAMENTO
-from ProyectoSennova.views import insertRegional, viewRegional, deleteRegional, viewUpdateRegional                                      #REGIONAL
-from ProyectoSennova.views import insertSector, viewSector, deleteSector, viewUpdateSector                                              #SECTOR
-from ProyectoSennova.views import insertJornada, viewJornada, deleteJornada, viewUpdateJornada                                          #JORNADA
-from ProyectoSennova.views import insertEmpresa, viewEmpresa, deleteEmpresa, viewUpdateEmpresa                                          #EMPRESA
-from ProyectoSennova.views import insertMunicipio, viewMunicipio, deleteMunicipio, viewUpdateMunicipio                                  #MUNICIPIO
-from ProyectoSennova.views import insertCentro, viewCentro, deleteCentro, viewUpdateCentro                                              #CENTRO
-from ProyectoSennova.views import insertOcupacion, viewOcupacion, deleteOcupacion, viewUpdateOcupacion                                  #OCUPACION
-from ProyectoSennova.views import insertConvenio, viewConvenio, deleteConvenio, viewUpdateConvenio                                      #CONVENIO
-from ProyectoSennova.views import insertCurso, viewCurso, deleteCurso, viewUpdateCurso                                                  #CURSO
-from ProyectoSennova.views import insertHora, viewHora, deleteHora, viewUpdateHoras                                                     #HORA
-from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, viewUpdateProgEsp                                          #PROGRAMA ESPECIAL
-from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor                   #PROGRAMA FORMACION
-from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha                                                  #FICHA
-from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz                     #APRENDIZ
+from ProyectoSennova.views import viewUpdatePais, viewpais, insertpais, resuljson, deletepais                                               #PAIS
+from ProyectoSennova.views import insertDepartamento, viewDepartamento, deleteDepartamento, viewUpdateDepartamento                          #DEPARTAMENTO
+from ProyectoSennova.views import insertRegional, viewRegional, deleteRegional, viewUpdateRegional                                          #REGIONAL
+from ProyectoSennova.views import insertSector, viewSector, deleteSector, viewUpdateSector                                                  #SECTOR
+from ProyectoSennova.views import insertJornada, viewJornada, deleteJornada, viewUpdateJornada                                              #JORNADA
+from ProyectoSennova.views import insertEmpresa, viewEmpresa, deleteEmpresa, viewUpdateEmpresa                                              #EMPRESA
+from ProyectoSennova.views import insertMunicipio, viewMunicipio, deleteMunicipio, viewUpdateMunicipio                                      #MUNICIPIO
+from ProyectoSennova.views import insertCentro, viewCentro, deleteCentro, viewUpdateCentro                                                  #CENTRO
+from ProyectoSennova.views import insertOcupacion, viewOcupacion, deleteOcupacion, viewUpdateOcupacion                                      #OCUPACION
+from ProyectoSennova.views import insertConvenio, viewConvenio, deleteConvenio, viewUpdateConvenio                                          #CONVENIO
+from ProyectoSennova.views import insertCurso, viewCurso, deleteCurso, viewUpdateCurso                                                      #CURSO
+from ProyectoSennova.views import insertHora, viewHora, deleteHora, viewUpdateHoras                                                         #HORA
+from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, viewUpdateProgEsp                                              #PROGRAMA ESPECIAL
+from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor                       #PROGRAMA FORMACION
+from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha                                                      #FICHA
+from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz    #APRENDIZ
 
 
 
@@ -121,7 +121,8 @@ urlpatterns = [
     path('aprendiz/', viewAprendiz),
     path('aprendiz/delete/<int:id>', deleteAprendiz, name='deleteAprendiz'),
     path('aprendiz/update/<int:id>', viewUpdateAprendiz, name='updateAprendiz'),
-    path('aprendiz/import/', importarAprendiz, name='importarAprendiz')
+    path('aprendiz/import/', importarAprendiz, name='importarAprendiz'),
+    path('aprendiz/update/foto/<int:id>', updateFotoAprendiz, name='updateFotoAprendiz')
 
 ] 
 

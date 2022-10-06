@@ -56,6 +56,7 @@
                                           <td>
                                             <a onclick="borrar('{{item.id}}')">E</a>
                                             <a href="{% url 'updateAprendiz' item.id %}">A</a>
+                                            <a href="{% url 'updateFotoAprendiz' item.id %}">Foto</a>
                                           </td>
                                       </tr>
                                       {% endfor %}
@@ -71,7 +72,7 @@
 <script>
     function borrar(id){   
     swal({
-            title: "¿Estas seguro de eliminar?",
+            title: "Estas seguro de eliminar?",
             text: "Si eliminas este elemento no podra ser recuperado",
             icon: "warning",
             buttons: true,

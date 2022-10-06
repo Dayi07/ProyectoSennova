@@ -41,12 +41,12 @@
     </section>
 
 {% include 'Inc/footer.html' %}
-
+ 
 
 <script>
   function borrar(id){   
   swal({
-          title: "¿Estas seguro de eliminar?",
+          title: "Estas seguro de eliminar?",
           text: "Si eliminas este elemento no podra ser recuperado",
           icon: "warning",
           buttons: true,
@@ -92,7 +92,7 @@
           var dt_basic = dt_basic_table.DataTable({
             ajax: "{% url 'jsonpais' %}",
             columns: [
-                  { data: 'id' },
+                  { data: 'id' }, 
                   { data: 'PAISC_Nombre' },
                   { data: 'Acciones' }, 
                 ],
