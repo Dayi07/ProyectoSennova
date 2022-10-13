@@ -1,16 +1,15 @@
-from ast import For
-from cgi import FieldStorage
 from contextvars import Context
 import encodings
+from genericpath import exists
 import imp
 from unicodedata import name
+from webbrowser import get
 from django.http import HttpResponse, JsonResponse
 import json
 from django.template import Template, Context
 import sqlalchemy
-from ProyectoSennova.models import Aprendiz, Centro, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
+from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
 from django.shortcuts import render, redirect
-from django.core.files.storage  import FileSystemStorage
 from django.contrib import messages
 from django.db import connection
 import pandas as pd   
@@ -19,7 +18,7 @@ from sqlalchemy import create_engine
 from django.views.decorators.csrf import csrf_exempt
 from shutil import rmtree
 import re
-
+from datetime import date
 
 #region PAIS CURSO
 def viewpais(request):
@@ -50,7 +49,6 @@ def resuljson(request):
     data = list(PaisCurso.objects.values())   
     return JsonResponse({'data' : data})
     
-
   
 def deletepais(request, id):
     pais = PaisCurso.objects.get(id = id)
@@ -964,6 +962,8 @@ def viewUpdateAprendiz(request, id):
         paginalistado = leer.render(parametros)
         return HttpResponse(paginalistado)
 
+
+
 @csrf_exempt
 def updateFotoAprendiz(request, id):
     if request.method == "POST" and request.FILES['APREN_Foto']:
@@ -989,6 +989,8 @@ def updateFotoAprendiz(request, id):
         paginalistado = leer.render(parametros)
         return HttpResponse(paginalistado)
 
+
+
 def importarAprendiz(request):
     #Se guarda el archivo para su lectura
     if request.method == "POST" :
@@ -1000,52 +1002,229 @@ def importarAprendiz(request):
         archivo = str(doc.importar)
         url = 'http://127.0.0.1:8000/media/'+archivo
 
-        #Se cre el engine(motor) con las especificaiones de la Base de Datos
+        #Se crea el engine(motor) con las especificaiones de la Base de Datos
         engine = create_engine('mysql://root:sena1234@localhost/ProyectoSennova')
 
-        try:
-            #Se hacen dos lecturas del documento excel
-            #Uno con el documento completo para la captura de la Ficha
-            datos = pd.read_excel(io = url, sheet_name=0, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
-            #Otra con solo los datos de la tabla
-            datos2 = pd.read_excel(io = url, sheet_name=0, header=4, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
-            
-            #Se hace la busqueda de la Ficha y se usa split para separar las demas palabras
-            busq = datos.loc[0,'APREN_Nombre']
-            busq.split()
-            ficha = re.split(r'\s+', busq)
+        #Se hacen dos lecturas del documento excel
+        #Uno con el documento completo para la captura de la Ficha
+        datos = pd.read_excel(io = url, sheet_name=0, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
+        #Otra con solo los datos de la tabla
+        datos2 = pd.read_excel(io = url, sheet_name=0, header=4, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None)
+        
+        #Se hace la busqueda de la Ficha y se usa split para separar las demas palabras
+        busq = datos.loc[0,'APREN_Nombre']
+        busq.split()
+        ficha = re.split(r'\s+', busq)
 
-            #Se busca en la clase la Ficha capturada
+
+
+        #Se busca en la clase la Ficha capturada si ya esta registrada se captura, si no esta registrada se guarda
+        if Ficha.objects.filter(FICHA_Identificador_Unico = ficha[0]):
             ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = ficha[0])
+            print('FICHA YA REGISTRADA', ficha_def.FICHA_Identificador_Unico)
+        else:
+            new_ficha = Ficha(
+                FICHA_Identificador_Unico = ficha[0],
+                FICHA_Fecha_Inicio = date.today(),
+                FICHA_Fecha_Terminacion = date.today(),
+                FICHA_Actualizacion_Carga = date.today(),
+                FICHA_Etapa = 'Por definir',
+                FICHA_Nombre_Responsable = 'Por definir',
+                jornada = Jornada(id = 1),
+                programaformacion = ProgramaFormacion(id = 18),
+                centro = Centro(id = 2)
+            )
+            new_ficha.save()
+            ficha_def = new_ficha
+            print('FICHA RECIENTE GUARDADA', ficha_def.FICHA_Identificador_Unico, ficha_def.FICHA_Fecha_Inicio)
 
-            #Se inserta una nueva columna con el Id de la Ficha
-            datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
+        #Se guarda la fecha de Actualizacion en la ficha
+        ficha_def.FICHA_Actualizacion_Carga = date.today()
+        ficha_def.save()
 
-            #Se crea una lista para almacenar los indices con datos duplicados (Que ya estan en la Base de Datos)            
-            lista = []
-            for i in range(0, len(datos2)):
-                #Se recorre la columna del Documento
-                num = datos2.iloc[i]['APREN_Documento']
-                try:
-                    #Se busca si esta en la Base de Datos y se agrega el indice a la lista 
-                    if Aprendiz.objects.get(APREN_Documento = num):
+        #Se inserta una nueva columna con el Id de la Ficha
+        datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
+
+        #Se crea una lista para almacenar los indices con datos duplicados (Que ya estan en la Base de Datos)            
+        lista = []
+        for i in range(0, len(datos2)):
+            #Se recorre la columna del Documento
+            num = datos2.iloc[i]['APREN_Documento']
+            try:
+                #Buscamos el estado del Aprendiz en el documento
+                est = datos2.loc[i, 'APREN_Estado']
+
+                #Se busca si esta en la Base de Datos
+                if Aprendiz.objects.get(APREN_Documento = num):
+                    aprendiz = Aprendiz.objects.get(APREN_Documento = num)
+
+                    #Comparamos el estado del aprendiz, lo guardamos en caso de que sea diferente y se agrega el indice a la lista 
+                    if aprendiz.APREN_Documento != est:
+                        aprendiz.APREN_Estado = est
+                        aprendiz.save()
                         lista.append(i)
-                except:
-                    continue             
+            except:
+                continue             
 
-            #Se borran las filas por medio de sus indices y se guarda en un nuevo DataFrame
-            datos_completos = datos2.drop(lista, axis=0)
-            
-            #Se borra la carpeta donde se encuentra el Excel debido a que ya hizo la lectura
-            rmtree("/ProyectoSennova/media/Importar")  
-
-            #Se guardan los datos del DataFrame en la Base de Datos          
-            datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
-
-        except:
-            return redirect('/aprendiz')  
+        #Se borran las filas por medio de sus indices y se guarda en un nuevo DataFrame
+        datos_completos = datos2.drop(lista, axis=0)
+        
+        #Se borra la carpeta donde se encuentra el Excel debido a que ya hizo la lectura
+        rmtree("/ProyectoSennova/media/Importar")  
+        #Se guardan los datos del DataFrame en la Base de Datos          
+        datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
     else:
         return render(request, 'aprendiz/import.html')
 
 #endregion 
 
+
+#region CONTRATO
+def insertContrato(request):
+    if request.method == "POST":
+        contrato = Contrato(
+            CONT_Fecha_Creacion = request.POST['CONT_Fecha_Creacion'],
+            CONT_Fecha_Inicio = request.POST['CONT_Fecha_Inicio'],
+            CONT_Fecha_Terminacion = request.POST['CONT_Fecha_Terminacion'],
+            CONT_Estado_Aprendiz = request.POST['CONT_Estado_Aprendiz'],
+            CONT_Estado_Contrato = request.POST['CONT_Estado_Contrato'],
+            aprendiz = Aprendiz.objects.get(id = request.POST['aprendiz']),
+            empresa = Empresa.objects.get(id = request.POST['empresa']),
+            )
+        contrato.save()
+        return redirect('/contrato/')
+    else:
+        aprendiz = Aprendiz.objects.all()
+        empresa = Empresa.objects.all()
+        parametros = dict({'aprendiz' : aprendiz, 'empresa' : empresa})
+        return render(request, 'Contrato/insert.html', parametros)
+
+
+def viewContrato(request):
+    contrato = Contrato.objects.select_related('empresa').select_related('aprendiz')
+    archivo = open("ProyectoSennova/Templates/Contrato/view.html")
+    leer = Template(archivo.read())
+    archivo.close
+    parametros = Context({'contrato' : contrato})
+    paginalistado = leer.render(parametros)
+    return HttpResponse(paginalistado)
+
+
+def deleteContrato(request, id):
+    contrato = Contrato.objects.get(id = id)
+    contrato.delete()
+    return redirect('/contrato')
+
+
+@csrf_exempt
+def viewUpdateContrato(request, id):
+    if request.method == "POST":
+        contrato = Contrato(id = id)
+        contrato.CONT_Fecha_Creacion = request.POST['CONT_Fecha_Creacion']
+        contrato.CONT_Fecha_Inicio = request.POST['CONT_Fecha_Inicio']
+        contrato.CONT_Fecha_Terminacion = request.POST['CONT_Fecha_Terminacion']
+        contrato.CONT_Estado_Aprendiz = request.POST['CONT_Estado_Aprendiz']
+        contrato.CONT_Estado_Contrato = request.POST['CONT_Estado_Contrato']
+        contrato.aprendiz = Aprendiz.objects.get(id = request.POST['aprendiz'])
+        contrato.empresa = Empresa.objects.get(id = request.POST['empresa'])
+        contrato.save()
+        return redirect('/contrato') 
+    else:
+        contrato = Contrato.objects.get(id = id)
+        aprendiz = Aprendiz.objects.all()
+        empresa = Empresa.objects.all()
+        archivo = open("ProyectoSennova/Templates/Contrato/update.html")
+        leer = Template(archivo.read())
+        archivo.close
+        parametros = Context({'contrato' : contrato, 'aprendiz' : aprendiz, 'empresa' : empresa})
+        paginalistado = leer.render(parametros)
+        return HttpResponse(paginalistado)
+
+
+
+def importarContrato(request):
+    if request.method == "POST" :
+        doc = Importar()
+        doc.importar = request.FILES.get('importar')
+        doc.save()
+
+        archivo = str(doc.importar)
+        url = 'http://127.0.0.1:8000/media/'+archivo
+
+        engine = create_engine('mysql://root:sena1234@localhost/ProyectoSennova')
+
+        datos = pd.read_excel(io = url,  sheet_name=0, header=0, names=['TIPODOCUMENTO', 'APREN_Documento', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'CONT_Estado_Aprendiz', 'MOTIVO', 'FECHA1','FICHA', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'CONT_Fecha_Creacion', 'NIT', 'EMPRESA', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion', 'CONT_Estado_Contrato'], index_col=None)
+        datos2 = datos.drop(['TIPODOCUMENTO', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'MOTIVO', 'FECHA1', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'NIT', 'EMPRESA'], axis=1)
+
+        datos2.insert(7, "aprendiz_id", 1, allow_duplicates=True)
+        datos2.insert(8, "empresa_id", 1, allow_duplicates=True)
+        lista = []
+        for i in range(0, len(datos2)):
+            
+            busq = datos2.loc[i,'FICHA']
+            num = datos2.iloc[i]['APREN_Documento']  
+            busq_empresa = datos.loc[i, 'NIT']
+            est_aprendiz = datos2.loc[i, 'CONT_Estado_Aprendiz']
+            est_contrato = datos2.loc[i, 'CONT_Estado_Contrato']
+            print('ESTADOOOOOOOOOOOOOOO',est_aprendiz)
+
+            if Ficha.objects.filter(FICHA_Identificador_Unico = busq):
+                ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = busq)
+                print('FICHA YA REGISTRADA', ficha_def.FICHA_Identificador_Unico)
+            else:
+                new_ficha = Ficha(
+                    FICHA_Identificador_Unico = busq,
+                    FICHA_Fecha_Inicio = date.today(),
+                    FICHA_Fecha_Terminacion = date.today(),
+                    FICHA_Actualizacion_Carga = date.today(),
+                    FICHA_Etapa = 'Por definir',
+                    FICHA_Nombre_Responsable = 'Por definir',
+                    jornada = Jornada(id = 1),
+                    programaformacion = ProgramaFormacion(id = 18),
+                    centro = Centro(id = 2)
+                )
+                new_ficha.save()
+                ficha_def = new_ficha
+                print('FICHA RECIENTE GUARDADA', ficha_def.FICHA_Identificador_Unico, ficha_def.FICHA_Fecha_Inicio)
+
+            if Aprendiz.objects.filter(APREN_Documento = num):
+                aprendiz = Aprendiz.objects.get(APREN_Documento = num)
+                datos2.loc[i,'aprendiz_id'] = aprendiz.id
+
+
+                if Contrato.objects.filter(aprendiz = aprendiz.id):
+                    contrato = Contrato.objects.get(aprendiz = aprendiz.id)
+                    lista.append(i)
+                    print('AÑADIDO A LA LISTA')
+                    
+                    if contrato.CONT_Estado_Aprendiz != est_aprendiz:
+                        contrato.CONT_Estado_Aprendiz = est_aprendiz
+                        contrato.save()
+                        print('ESTADO APRENDIZ CAMBIADO')
+
+                        
+                    if contrato.CONT_Estado_Contrato != est_contrato:
+                        contrato.CONT_Estado_Contrato = est_contrato
+                        contrato.save()
+                        print('ESTADO CONTRATO CAMBIADO')
+                
+
+
+            if Empresa.objects.filter(EMPRE_Identificacion = busq_empresa):
+                empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
+                datos2.loc[i, 'empresa_id'] = empresa.id
+
+
+
+        datos3 = datos2.drop(['APREN_Documento', 'FICHA'], axis=1)
+        datos_completos = datos3.drop(lista, axis=0)
+        
+        
+        datos_completos.to_sql(name = 'Contrato', con = engine, if_exists = 'append', index=False)
+
+
+    else:
+        return render(request, 'contrato/import.html')
+
+
+#endregion

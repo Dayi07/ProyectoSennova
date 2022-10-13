@@ -1,14 +1,13 @@
 {% include 'Inc/header.html' %}
-
-                      <h2 class="content-header-title float-start mb-0">Aprendiz</h2>
+                      <h2 class="content-header-title float-start mb-0">Contrato</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="/aprendiz">Listado</a>
+                                <li class="breadcrumb-item"><a href="/contrato">Listado</a>
                                 </li>
-                                <li class="breadcrumb-item"><a href="/aprendiz/insert/">Insertar</a>
-                                </li> 
-                                <li class="breadcrumb-item"><a href="/aprendiz/import/">Importar</a>
-                                </li>                               
+                                <li class="breadcrumb-item"><a href="/contrato/insert/">Insertar</a>
+                                </li>
+                                <li class="breadcrumb-item"><a href="/contrato/import/">Importar</a>
+                                </li>
                             </ol>
                         </div>
                     </div>
@@ -32,35 +31,34 @@
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Foto</th>
-                                        <th>Nombre</th>
-                                        <th>Documento</th>
-                                        <th>Celular</th>
-                                        <th>Correo</th>
-                                        <th>Estado</th>
-                                        <th>Ficha</th>
+                                        <th>Fecha Creacion</th>
+                                        <th>Fecha Inicio</th> 
+                                        <th>Fecha Finalizacion</th>
+                                        <th>Estado del Aprendiz</th>
+                                        <th>Estado del Contrato</th>
+                                        <th>Apreniz</th>
+                                        <th>Empresa</th>
                                         <th>Acciones</th>
                                     </tr>
-                                </thead> 
+                                </thead>
                                 <tbody>
-                                    {% for item in aprendiz %}
-                                      <tr>
-                                          <td></td>
-                                          <td> <img src="/media/{{ item.APREN_Foto }}" class="round" width="40px" height="40px"></td>
-                                          <td>{{ item.APREN_Nombre }} {{ item.APREN_Apellido }}</td>
-                                          <td>{{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }}</td>
-                                          <td>{{ item.APREN_Celular }}</td>
-                                          <td>{{ item.APREN_Correo }}</td>
-                                          <td>{{ item.APREN_Estado }}</td>
-                                          <td>{{ item.ficha.FICHA_Identificador_Unico }}</td>
-                                          <td>
-                                            <a onclick="borrar('{{item.id}}')">E</a>
-                                            <a href="{% url 'updateAprendiz' item.id %}">A</a>
-                                            <a href="{% url 'updateFotoAprendiz' item.id %}">Foto</a>
-                                          </td>
-                                      </tr>
-                                      {% endfor %}
-                                  </tbody>
+                                    {% for item in contrato %}
+                                    <tr>
+                                        <td></td>
+                                        <td>{{ item.CONT_Fecha_Creacion }}</td>
+                                        <td>{{ item.CONT_Fecha_Inicio }}</td>
+                                        <td>{{ item.CONT_Fecha_Terminacion }}</td>
+                                        <td>{{ item.CONT_Estado_Aprendiz }}</td>
+                                        <td>{{ item.CONT_Estado_Contrato }}</td>
+                                        <td>{{ item.aprendiz.APREN_Documento }}</td>
+                                        <td>{{ item.empresa.EMPRE_Nombre }}</td>
+                                        <td>
+                                          <a onclick="borrar('{{item.id}}')">E</a>
+                                          <a href="{% url 'updateContrato' item.id %}">A</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
                             </table>
                         </div>
                     </div>

@@ -1,0 +1,99 @@
+{% include 'Inc/header.html' %}
+                        <h2 class="content-header-title float-start mb-0">Contrato</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/contrato">Listado</a>
+                                </li>
+                                <li class="breadcrumb-item"><a href="/contrato/insert/">Insertar</a>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <div class="mb-1 breadcrumb-right">
+                    <div class="dropdown">
+                        <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="grid"></i></button>
+                        <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#"><i class="me-1" data-feather="check-square"></i><span class="align-middle">Todo</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="message-square"></i><span class="align-middle">Chat</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="mail"></i><span class="align-middle">Email</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="calendar"></i><span class="align-middle">Calendar</span></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+<section id="basic-input" class="tootip-validations">            
+    <div class="content-body">
+        <form class="needs-validation" action=" " method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                 <div class="card-header">
+                     <h4 class="card-title">Actualizar Contrato</h4>
+                 </div>
+                 <div class="card-body">
+                     <div class="row">
+                         <div class="col-xl-4 col-md-6 col-12">
+                             <div class="mb-1">
+                                 <input type="hidden" name="id" id="id" value="{{ contrato.id }}">
+                                 <label class="form-label" for="CONT_Fecha_Creacion">Ingrese fecha de creacion:</label>
+                                 <input type="date" class="form-control" id="CONT_Fecha_Creacion" name="CONT_Fecha_Creacion" value="{{ contrato.CONT_Fecha_Creacion|date:'Y-m-d'  }}"  required/>
+                                 <div class="invalid-tooltip">Las horas de monitores son obligatorias.</div>
+                             </div>
+                         </div>
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CONT_Fecha_Inicio">Ingrese fecha de inicio:</label>
+                                <input type="date" class="form-control" id="CONT_Fecha_Inicio" name="CONT_Fecha_Inicio" value="{{ contrato.CONT_Fecha_Inicio|date:'Y-m-d' }}"  required/>
+                                <div class="invalid-tooltip">Las horas de empresa son obligatorias.</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CONT_Fecha_Terminacion">Ingrese fecha de finalizacion:</label>
+                                <input type="date" class="form-control" id="CONT_Fecha_Terminacion" name="CONT_Fecha_Terminacion" value="{{ contrato.CONT_Fecha_Terminacion|date:'Y-m-d' }}"  required/>
+                                <div class="invalid-tooltip">Las horas de contratistas son obligatorias.</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CONT_Estado_Aprendiz">Ingrese estado del Aprendiz:</label>
+                                <input type="text" class="form-control" id="CONT_Estado_Aprendiz" name="CONT_Estado_Aprendiz" value="{{ contrato.CONT_Estado_Aprendiz }}"  required/>
+                                <div class="invalid-tooltip">Las horas planta son obligatorias.</div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="CONT_Estado_Contrato">Ingrese estado del Contrato:</label>
+                                <input type="text" class="form-control" id="CONT_Estado_Contrato" name="CONT_Estado_Contrato" value="{{ contrato.CONT_Estado_Contrato }}"  required/>
+                                <div class="invalid-tooltip">El total de horas son obligatorias.</div>
+                            </div>
+                        </div>
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="aprendiz">Seleccione aprendiz:</label>
+                                <select class="form-select" aria-label="Default select example" name="aprendiz" id="aprendiz" required>
+                                    {% for item in aprendiz %}
+                                    <option value="{{ item.id }}">{{ item.APREN_Documento }}</option>
+                                    {% endfor %}
+                                </select>                             
+                                <div class="invalid-tooltip">El aprendiz es obligatorio.</div>
+                            </div>
+                         </div> 
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label class="form-label" for="empresa">Seleccione empresa:</label>
+                                <select class="form-select" aria-label="Default select example" name="empresa" id="empresa" required>
+                                    {% for item in empresa %}
+                                    <option value="{{ item.id }}">{{ item.EMPRE_Nombre }}</option>
+                                    {% endfor %}
+                                </select>                             
+                                <div class="invalid-tooltip">La empresa es obligatoria.</div>
+                            </div>
+                         </div> 
+                     </div>
+                     <button class="btn btn-primary" type="submit">Guardar</button>
+                 </div>
+             </div>
+        </form>
+    </div>
+
+{% include 'Inc/footer.html' %}

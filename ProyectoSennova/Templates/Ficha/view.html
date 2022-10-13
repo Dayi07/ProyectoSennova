@@ -37,6 +37,7 @@
                                         <th>Jornada</th>
                                         <th>Programa de Formacion</th>
                                         <th>Centro</th>
+                                        <th>Ultima Actualizacion</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -52,6 +53,7 @@
                                         <td>{{ item.centro.CENTR_Nombre }}</td>
                                         <td>{{ item.programaformacion.PROGR_Nombre }}</td>
                                         <td>{{ item.jornada.JORNA_Nombre }}</td>
+                                        <td>{{ item.FICHA_Actualizacion_Carga }}</td>
                                         <td>
                                           <a onclick="borrar('{{item.id}}')">E</a>
                                           <a href="{% url 'updateFicha' item.id %}">A</a>

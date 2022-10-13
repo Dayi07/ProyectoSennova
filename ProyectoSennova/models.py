@@ -98,6 +98,7 @@ class Ficha(models.Model):
     FICHA_Fecha_Terminacion = models.DateField() 
     FICHA_Etapa = models.CharField(max_length=50)
     FICHA_Nombre_Responsable = models.CharField(max_length=50)
+    FICHA_Actualizacion_Carga = models.DateField() 
     centro = models.ForeignKey(
         Centro,
         on_delete = models.CASCADE
@@ -207,7 +208,28 @@ class Aprendiz(models.Model):
     class Meta:
         db_table = 'Aprendiz'
 
+
+
 class Importar(models.Model):
     importar = models.FileField(upload_to='Importar/', blank=True, null=True)
     class Meta:
         db_table = 'Importar'
+
+
+
+class Contrato(models.Model):
+    CONT_Fecha_Creacion = models.DateField()
+    CONT_Fecha_Inicio = models.DateField()
+    CONT_Fecha_Terminacion = models.DateField()
+    CONT_Estado_Aprendiz = models.CharField(max_length=50)
+    CONT_Estado_Contrato = models.CharField(max_length=50)
+    aprendiz = models.ForeignKey(
+        Aprendiz,
+        on_delete = models.CASCADE
+    )
+    empresa = models.ForeignKey(
+        Empresa,
+        on_delete = models.CASCADE
+    )
+    class Meta:
+        db_table = 'Contrato'

@@ -34,7 +34,7 @@ from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, vie
 from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor                       #PROGRAMA FORMACION
 from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha                                                      #FICHA
 from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz    #APRENDIZ
-
+from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato                        #Contrato
 
 
 urlpatterns = [
@@ -122,7 +122,13 @@ urlpatterns = [
     path('aprendiz/delete/<int:id>', deleteAprendiz, name='deleteAprendiz'),
     path('aprendiz/update/<int:id>', viewUpdateAprendiz, name='updateAprendiz'),
     path('aprendiz/import/', importarAprendiz, name='importarAprendiz'),
-    path('aprendiz/update/foto/<int:id>', updateFotoAprendiz, name='updateFotoAprendiz')
+    path('aprendiz/update/foto/<int:id>', updateFotoAprendiz, name='updateFotoAprendiz'),
+
+    path('contrato/insert/', insertContrato),
+    path('contrato/', viewContrato),
+    path('contrato/delete/<int:id>', deleteContrato, name='deleteContrato'),
+    path('contrato/update/<int:id>', viewUpdateContrato, name='updateContrato'),
+    path('contrato/import/', importarContrato, name='importarContrato')
 
 ] 
 
