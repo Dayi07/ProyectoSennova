@@ -57,6 +57,7 @@
                                         <td>
                                           <a onclick="borrar('{{item.id}}')">E</a>
                                           <a href="{% url 'updateFicha' item.id %}">A</a>
+                                          <a href="{% url 'viewDetallesFicha' item.id %}">Detalles</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

@@ -84,11 +84,11 @@
                                         <label class="form-label" for="programaformacion">Seleccione programa de formacion:</label>
                                         <select class="form-select" aria-label="Default select example" name="programaformacion" id="programaformacion" required>
                                             <option value="{{ ficha.programaformacion.id }}">{{ ficha.programaformacion.PROGR_Nombre }}</option>
-                                            {% for item in programaformacion %}
+                                            {% for item in programa %}
                                             <option value="{{ item.id }}">{{ item.PROGR_Nombre }}</option>
                                             {% endfor %}
                                         </select>                             
-                                        <div class="invalid-tooltip">El programaa es obligatorio.</div>
+                                        <div class="invalid-tooltip">El centro es obligatorio.</div>
                                     </div>
                                  </div>
                                  <div class="col-xl-4 col-md-6 col-12">

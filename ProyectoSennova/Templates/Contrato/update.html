@@ -71,6 +71,7 @@
                             <div class="mb-1">
                                 <label class="form-label" for="aprendiz">Seleccione aprendiz:</label>
                                 <select class="form-select" aria-label="Default select example" name="aprendiz" id="aprendiz" required>
+                                    <option value="{{ contrato.aprendiz.id }}">{{ contrato.aprendiz.APREN_Documento }}</option>
                                     {% for item in aprendiz %}
                                     <option value="{{ item.id }}">{{ item.APREN_Documento }}</option>
                                     {% endfor %}
@@ -82,6 +83,7 @@
                             <div class="mb-1">
                                 <label class="form-label" for="empresa">Seleccione empresa:</label>
                                 <select class="form-select" aria-label="Default select example" name="empresa" id="empresa" required>
+                                    <option value="{{ contrato.empresa.id }}">{{ contrato.empresa.EMPRE_Nombre }}</option>
                                     {% for item in empresa %}
                                     <option value="{{ item.id }}">{{ item.EMPRE_Nombre }}</option>
                                     {% endfor %}

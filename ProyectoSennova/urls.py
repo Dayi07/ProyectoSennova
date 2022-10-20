@@ -32,7 +32,7 @@ from ProyectoSennova.views import insertCurso, viewCurso, deleteCurso, viewUpdat
 from ProyectoSennova.views import insertHora, viewHora, deleteHora, viewUpdateHoras                                                         #HORA
 from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, viewUpdateProgEsp                                              #PROGRAMA ESPECIAL
 from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor                       #PROGRAMA FORMACION
-from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha                                                      #FICHA
+from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetalles                                        #FICHA
 from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz    #APRENDIZ
 from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato                        #Contrato
 
@@ -116,6 +116,8 @@ urlpatterns = [
     path('ficha/', viewFicha),
     path('ficha/delete/<int:id>', deleteFicha, name='deleteFicha'),
     path('ficha/update/<int:id>', viewUpdateFicha, name='updateFicha'),
+    path('ficha/detalles/<int:id>', viewDetalles, name='viewDetallesFicha'),
+
 
     path('aprendiz/insert/', insertAprendiz),
     path('aprendiz/', viewAprendiz),
