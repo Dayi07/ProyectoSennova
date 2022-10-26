@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from unicodedata import name
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls.static import static
@@ -31,10 +32,10 @@ from ProyectoSennova.views import insertConvenio, viewConvenio, deleteConvenio, 
 from ProyectoSennova.views import insertCurso, viewCurso, deleteCurso, viewUpdateCurso                                                      #CURSO
 from ProyectoSennova.views import insertHora, viewHora, deleteHora, viewUpdateHoras                                                         #HORA
 from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, viewUpdateProgEsp                                              #PROGRAMA ESPECIAL
-from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor                       #PROGRAMA FORMACION
-from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetalles                                        #FICHA
-from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz    #APRENDIZ
-from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato                        #Contrato
+from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor, viewDetallesProgFor  #PROGRAMA FORMACION
+from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetallesFicha                                   #FICHA
+from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz, viewDetallesAprendiz    #APRENDIZ
+from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato, viewDetallesContrato  #Contrato
 
 
 urlpatterns = [
@@ -110,14 +111,13 @@ urlpatterns = [
     path('programafor/delete/<int:id>', deleteProgFor, name='deleteProgFor'),
     path('programafor/update/<int:id>', viewUpdateProgFor, name='updateProgramaFor'),
     path('programafor/updateFile/<int:id>', viewUpdateFileProgFor, name='UpdateFileProgFor'),
-
+    path('programafor/detalles/<int:id>', viewDetallesProgFor, name='viewDetallesProgFor'),
 
     path('ficha/insert/', insertFicha),
     path('ficha/', viewFicha),
     path('ficha/delete/<int:id>', deleteFicha, name='deleteFicha'),
     path('ficha/update/<int:id>', viewUpdateFicha, name='updateFicha'),
-    path('ficha/detalles/<int:id>', viewDetalles, name='viewDetallesFicha'),
-
+    path('ficha/detalles/<int:id>', viewDetallesFicha, name='viewDetallesFicha'),
 
     path('aprendiz/insert/', insertAprendiz),
     path('aprendiz/', viewAprendiz),
@@ -125,12 +125,14 @@ urlpatterns = [
     path('aprendiz/update/<int:id>', viewUpdateAprendiz, name='updateAprendiz'),
     path('aprendiz/import/', importarAprendiz, name='importarAprendiz'),
     path('aprendiz/update/foto/<int:id>', updateFotoAprendiz, name='updateFotoAprendiz'),
+    path('aprendiz/detalles/<int:id>', viewDetallesAprendiz, name='viewDetallesAprendiz'),
 
     path('contrato/insert/', insertContrato),
     path('contrato/', viewContrato),
     path('contrato/delete/<int:id>', deleteContrato, name='deleteContrato'),
     path('contrato/update/<int:id>', viewUpdateContrato, name='updateContrato'),
-    path('contrato/import/', importarContrato, name='importarContrato')
+    path('contrato/import/', importarContrato, name='importarContrato'),
+    path('contrato/detalles/<int:id>', viewDetallesContrato, name='viewDetallesContrato' )
 
 ] 
 

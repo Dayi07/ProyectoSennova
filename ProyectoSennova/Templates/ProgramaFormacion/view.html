@@ -30,12 +30,9 @@
                                     <tr>
                                         <th></th>
                                         <th>Nombre</th>
-                                        <th>Modalidad</th>
                                         <th>Tipo</th> 
                                         <th>Duracion</th>
-                                        <th>Version</th>
                                         <th>Nivel</th>
-                                        <th>Sector</th>
                                         <th>PDF</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -45,12 +42,9 @@
                                     <tr>
                                         <td></td>
                                         <td>{{ item.PROGR_Nombre }}</td>
-                                        <td>{{ item.PROGR_Modalidad }}</td>
                                         <td>{{ item.PROGR_Tipo_Formacion }}</td>
                                         <td>{{ item.PROGR_Duracion }}</td>
-                                        <td>{{ item.PROGR_Version }}</td>
                                         <td>{{ item.PROGR_Nivel }}</td>
-                                        <td>{{ item.sector.SECTO_Nombre }}</td>
                                         <td>
                                             <a href="/media/{{ item.PROGR_URL}}"> PDF</a>
                                         </td>
@@ -58,6 +52,7 @@
                                           <a onclick="borrar('{{item.id}}')">E</a>
                                           <a href="{% url 'updateProgramaFor' item.id %}">A</a>
                                           <a href="{% url 'UpdateFileProgFor' item.id %}">F</a>
+                                          <a href="{% url 'viewDetallesProgFor' item.id %}">Detalles</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

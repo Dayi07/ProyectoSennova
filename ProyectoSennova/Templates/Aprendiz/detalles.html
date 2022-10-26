@@ -1,0 +1,63 @@
+{% include 'Inc/header.html' %}
+                      <h2 class="content-header-title float-start mb-0">Aprendiz</h2>
+                            <div class="breadcrumb-wrapper">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/aprendiz">Listado</a>
+                                    </li>
+                                    <li class="breadcrumb-item"><a href="/aprendiz/insert/">Insertar</a>
+                                    </li>                   
+                                </ol>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <div class="mb-1 breadcrumb-right">
+                    <div class="dropdown">
+                        <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="grid"></i></button>
+                        <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#"><i class="me-1" data-feather="check-square"></i><span class="align-middle">Todo</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="message-square"></i><span class="align-middle">Chat</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="mail"></i><span class="align-middle">Email</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="calendar"></i><span class="align-middle">Calendar</span></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-body">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                           <div class="mb-1">
+                                <center><img src="/media/{{ aprendiz.APREN_Foto }}" width="100px" height="100px"> <br><br>                                    
+                                    <h4> {{ aprendiz.APREN_Nombre }} {{ aprendiz.APREN_Apellido }} </h4>
+                                    <h5><b>Documento:</b> {{ aprendiz.APREN_Tipo_Documento }} {{ aprendiz.APREN_Documento }} </h5><br>
+                                    
+                                    <h5><b>Correo:</b> {{ aprendiz.APREN_Correo }} </h5>
+                                    <h5><b>Celuar:</b> {{ aprendiz.APREN_Celular }}</h5><br>
+                                    
+                                    <h5><b>Programa de Formacion: </b> {{ aprendiz.ficha.programaformacion.PROGR_Nombre }} </h5>
+                                    <h5><b>Ficha: </b> {{ aprendiz.ficha.FICHA_Identificador_Unico }} </h5>
+                                    <h5><b>Estado:</b> {{ aprendiz.APREN_Estado }} </h5> <br>
+                                </center>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if verificar == True %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mb-1">
+                            {% for item in contrato %}
+                                <h4><b>Contrato:</b> {{ item.CONT_Estado_Contrato }} </h4>
+                                <h5><b>Empresa:</b> {{ item.empresa.EMPRE_Nombre }} </h5>
+                                <h5><b>Fecha de inicio:</b> {{ item.CONT_Fecha_Inicio }} </h5>
+                                <h5><b>Fecha de finalizacion:</b> {{ item.CONT_Fecha_Terminacion }} </h5> <br>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            {% endif %}
+
+       </div>
+{% include 'Inc/footer.html' %}
+

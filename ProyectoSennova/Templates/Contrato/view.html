@@ -32,8 +32,6 @@
                                     <tr>
                                         <th></th>
                                         <th>Fecha Creacion</th>
-                                        <th>Fecha Inicio</th> 
-                                        <th>Fecha Finalizacion</th>
                                         <th>Estado del Aprendiz</th>
                                         <th>Estado del Contrato</th>
                                         <th>Aprendiz</th>
@@ -46,8 +44,6 @@
                                     <tr>
                                         <td></td>
                                         <td>{{ item.CONT_Fecha_Creacion }}</td>
-                                        <td>{{ item.CONT_Fecha_Inicio }}</td>
-                                        <td>{{ item.CONT_Fecha_Terminacion }}</td>
                                         <td>{{ item.CONT_Estado_Aprendiz }}</td>
                                         <td>{{ item.CONT_Estado_Contrato }}</td>
                                         <td>{{ item.aprendiz.APREN_Documento }}</td>
@@ -55,6 +51,7 @@
                                         <td>
                                           <a onclick="borrar('{{item.id}}')">E</a>
                                           <a href="{% url 'updateContrato' item.id %}">A</a>
+                                          <a href="{% url 'viewDetallesContrato' item.id %}">Detalles</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

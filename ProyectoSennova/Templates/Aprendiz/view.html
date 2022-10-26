@@ -32,11 +32,8 @@
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th>Foto</th>
                                         <th>Nombre</th>
                                         <th>Documento</th>
-                                        <th>Celular</th>
-                                        <th>Correo</th>
                                         <th>Estado</th>
                                         <th>Ficha</th>
                                         <th>Acciones</th>
@@ -46,17 +43,15 @@
                                     {% for item in aprendiz %}
                                       <tr>
                                           <td></td>
-                                          <td> <img src="/media/{{ item.APREN_Foto }}" class="round" width="40px" height="40px"></td>
                                           <td>{{ item.APREN_Nombre }} {{ item.APREN_Apellido }}</td>
                                           <td>{{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }}</td>
-                                          <td>{{ item.APREN_Celular }}</td>
-                                          <td>{{ item.APREN_Correo }}</td>
                                           <td>{{ item.APREN_Estado }}</td>
                                           <td>{{ item.ficha.FICHA_Identificador_Unico }}</td>
                                           <td>
                                             <a onclick="borrar('{{item.id}}')">E</a>
                                             <a href="{% url 'updateAprendiz' item.id %}">A</a>
-                                            <a href="{% url 'updateFotoAprendiz' item.id %}">Foto</a>
+                                            <a href="{% url 'updateFotoAprendiz' item.id %}">Foto</a>  
+                                            <a href="{% url 'viewDetallesAprendiz' item.id %}">Detalles</a>
                                           </td>
                                       </tr>
                                       {% endfor %}

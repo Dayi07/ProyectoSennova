@@ -31,29 +31,41 @@
                            <div class="mb-1">
                                 <b>Total de aprendices:</b> {{ total_apre }} <br>
                                 <b>Encargado:</b> {{ ficha.FICHA_Nombre_Responsable }} <br>
-                                <b>Programa de formacion:</b> {{ ficha.programaformacion.PROGR_Nombre}}
+                                <b>Programa de formacion:</b> {{ ficha.programaformacion.PROGR_Nombre}} <br>
+                                <b>Jornada:</b> {{ ficha.jornada.JORNA_Nombre}} <br>
+                                <b>Centro:</b> {{ ficha.centro.CENTR_Nombre}} <br>
+
                            </div>
                        </div> 
                     </div>
                 </div>
             </div>
        </div>
-                <div class="card">
-                     <div class="card-header">
-                         <h4 class="card-title"> Aprendices asociados a la ficha: </h4>
-                     </div>
-                     <div class="card-body">
-                         <div class="row">
-                            <div class="col-xl-4 col-md-6 col-12">
-                                <div class="mb-1">
-                                    {% for item in aprendiz %}
-                                            {{ item.APREN_Nombre }} {{ item.APREN_Apellido }} <br>
-                                    {% endfor %}
-                                </div>
-                            </div> 
-                         </div>
-                     </div>
-                 </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title"> Aprendices asociados a la ficha: </h4>
+                </div>
+                <section id="basic-datatable">
+                    <table class="datatables-basic table">
+                        <thead> 
+                            <tr>                                        
+                                <th>Aprendiz</th>
+                                <th>Documento</th>
+                                <th>Estado del Aprendiz</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in aprendiz %}
+                            <tr>
+                                <td> {{ item.APREN_Nombre }} {{ item.APREN_Apellido }} </td>
+                                <td> {{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }} </td>
+                                <td> {{ item.APREN_Estado }} </td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>                        
+                </section>            
             </div>
 
             <div class="card">
@@ -93,6 +105,7 @@
                             <tr>                                        
                                 <th>Aprendiz</th>
                                 <th>Estado del aprendiz</th>
+                                <th>Estado del Contrato</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -100,6 +113,7 @@
                             <tr>
                                 <td> {{ item.aprendiz.APREN_Nombre }} </td>
                                 <td> {{ item.CONT_Estado_Aprendiz }} </td>
+                                <td> {{ item.CONT_Estado_Contrato }} </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -108,10 +122,8 @@
             </div>
 
 
-       </div>
 
            
-       </div>
 
 
 {% include 'Inc/footer.html' %}

@@ -826,6 +826,22 @@ def viewUpdateFileProgFor(request, id):
         paginalistado = leer.render(parametros)
         return HttpResponse(paginalistado)
 
+
+def viewDetallesProgFor(request, id):
+    programa = ProgramaFormacion.objects.get(id = id)
+    ficha = Ficha.objects.filter(programaformacion = programa.id)
+    
+    total_ficha = len(ficha)
+
+    archivo = open("ProyectoSennova/Templates/ProgramaFormacion/detalles.html")
+    leer = Template(archivo.read())
+    archivo.close
+
+    #Se envian las variables a la vista
+    parametros = Context({'programa' : programa, 'ficha' : ficha, 'total_ficha' : total_ficha})
+    paginalistado = leer.render(parametros)
+    return HttpResponse(paginalistado)
+
 #endregion
 
 
@@ -899,7 +915,7 @@ def viewUpdateFicha(request, id):
         return HttpResponse(paginalistado)
 
 
-def viewDetalles(request, id):
+def viewDetallesFicha(request, id):
     ficha = Ficha.objects.get(id = id)
     aprendiz = Aprendiz.objects.filter(ficha = ficha.id)
     
@@ -1124,6 +1140,22 @@ def importarAprendiz(request):
     else:
         return render(request, 'aprendiz/import.html')
 
+
+def viewDetallesAprendiz(request, id):
+    aprendiz = Aprendiz.objects.get(id = id)
+    contrato = Contrato.objects.filter(aprendiz = aprendiz.id)
+    verificar = contrato.exists()
+    
+    archivo = open("ProyectoSennova/Templates/Aprendiz/detalles.html")
+    leer = Template(archivo.read())
+    archivo.close
+
+    #Se envian las variables a la vista   
+    parametros = Context({'aprendiz' : aprendiz, 'contrato' : contrato, 'verificar' : verificar})
+    paginalistado = leer.render(parametros)
+    return HttpResponse(paginalistado)
+
+
 #endregion 
 
 
@@ -1325,5 +1357,18 @@ def importarContrato(request):
         #Se retorna una vista
         return render(request, 'contrato/import.html')
 
+
+def viewDetallesContrato(request, id):
+    contrato = Contrato.objects.get(id = id)
+    aprendiz = Aprendiz.objects.get(APREN_Documento = contrato.aprendiz.APREN_Documento)
+    
+    archivo = open("ProyectoSennova/Templates/Contrato/detalles.html")
+    leer = Template(archivo.read())
+    archivo.close
+
+    #Se envian las variables a la vista
+    parametros = Context({'aprendiz' : aprendiz, 'contrato' : contrato})
+    paginalistado = leer.render(parametros)
+    return HttpResponse(paginalistado)
 
 #endregion

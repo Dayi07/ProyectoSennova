@@ -34,9 +34,6 @@
                                         <th>Fecha de terminacion</th>
                                         <th>Etapa </th>
                                         <th>Responsable</th>
-                                        <th>Jornada</th>
-                                        <th>Programa de Formacion</th>
-                                        <th>Centro</th>
                                         <th>Ultima Actualizacion</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -50,9 +47,6 @@
                                         <td>{{ item.FICHA_Fecha_Terminacion }}</td>
                                         <td>{{ item.FICHA_Etapa }}</td>
                                         <td>{{ item.FICHA_Nombre_Responsable }}</td>
-                                        <td>{{ item.centro.CENTR_Nombre }}</td>
-                                        <td>{{ item.programaformacion.PROGR_Nombre }}</td>
-                                        <td>{{ item.jornada.JORNA_Nombre }}</td>
                                         <td>{{ item.FICHA_Actualizacion_Carga }}</td>
                                         <td>
                                           <a onclick="borrar('{{item.id}}')">E</a>
