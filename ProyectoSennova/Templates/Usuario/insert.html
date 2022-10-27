@@ -1,0 +1,84 @@
+{% include 'Inc/headerLogin.html' %}
+{% load static %}
+
+<body class="vertical-layout vertical-menu-modern blank-page navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="blank-page">
+    <!-- BEGIN: Content-->
+    <div class="app-content content ">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <div class="auth-wrapper auth-cover">
+                    <div class="auth-inner row m-0">
+                        <!-- Brand logo--><a class="brand-logo" href="index.html">
+                            <h2 style="color:rgb(248, 109, 23);" class="brand-text">GAFP - CTGI</h2>
+                        </a>
+                        <!-- /Brand logo-->
+                        <!-- Left Text-->
+                        <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
+                            <div class="w-100 d-lg-flex align-items-center justify-content-center px-5"><img class="img-fluid" src='{% static "images/pages/register-v2.svg" %}' alt="Register V2" /></div>
+                        </div>
+                        <!-- /Left Text-->
+                        <!-- Register-->
+                        <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
+                                <h2 class="card-title fw-bold mb-1">Registrarse 🚀</h2>
+                                <p class="card-text mb-2">Registre sus datos para tener acceso al sistema</p>
+                               
+                                <section id="basic-input" class="tootip-validations">                     
+
+                                <form class="needs-validation" method="POST"  novalidate>
+                                    {% csrf_token %}
+
+                                    <div class="mb-1">
+                                        <label class="form-label" for="first_name">Nombres</label>
+                                        <input class="form-control" id="first_name" type="text" name="first_name" placeholder="Nombres" aria-describedby="register-username" autofocus="" required />
+                                        <div class="invalid-tooltip">El nombre es obligatorio.</div>
+                                    </div>
+
+                                    <div class="mb-1">
+                                        <label class="form-label" for="register-username">Apellidos</label>
+                                        <input class="form-control" id="register-username" type="text" name="last_name" placeholder="Apellidos" aria-describedby="register-username" autofocus="" required />
+                                        <div class="invalid-tooltip">El apellido es obligatorio.</div>
+                                    </div>
+
+                                    <div class="mb-1">
+                                        <label class="form-label" for="register-username">Username</label>
+                                        <input class="form-control" id="register-username" type="text" name="username" placeholder="johndoe" aria-describedby="register-username" autofocus="" required />
+                                        <div class="invalid-tooltip">El username es obligatorio.</div>
+                                    </div>
+
+                                    <div class="mb-1">
+                                        <label class="form-label" for="register-email">Email</label>
+                                        <input class="form-control" id="register-email" type="text" name="email" placeholder="john@example.com" aria-describedby="register-email" required />
+                                        <div class="invalid-tooltip">El email es obligatorio.</div>
+                                    </div>
+
+                                    <div class="mb-1">
+                                        <label class="form-label" for="register-password">Password</label>
+                                        <div class="input-group input-group-merge form-password-toggle">
+                                            <input class="form-control form-control-merge" id="register-password" type="password" name="password" placeholder="············" aria-describedby="register-password" required /><span class="input-group-text cursor-pointer"><i data-feather="eye"></i></span>
+                                        </div>
+                                        <div class="invalid-tooltip">La contraseña es obligatoria.</div>
+                                    </div>
+                                    <br>
+                                
+                                    <button class="btn btn-primary w-100" required>Sign up</button>
+                                </form>
+                                </section>
+
+                                <p class="text-center mt-2"><span>Ya tienes una cuenta?</span><a href="/usuario/login"><span>&nbsp;Ingresa aqui</span></a></p>
+                            </div>
+                        </div>
+                        <!-- /Register-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <!-- END: Content-->
+
+
+{% include 'Inc/footerLogin.html' %}

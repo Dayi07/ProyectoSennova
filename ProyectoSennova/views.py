@@ -9,6 +9,8 @@ from django.http import HttpResponse, JsonResponse
 import json
 from django.template import Template, Context
 import sqlalchemy
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -23,6 +25,9 @@ from datetime import date, datetime
 
 #region PAIS CURSO
 def viewpais(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     pais = PaisCurso.objects.all()
     archivopais = open("ProyectoSennova/Templates/PaisCurso/view.html")
     leer = Template(archivopais.read())
@@ -57,7 +62,6 @@ def deletepais(request, id):
     return redirect('/pais')
 
 
-@csrf_exempt
 def viewUpdatePais(request, id):
     if request.method == "POST":
         pais = PaisCurso(id = id)
@@ -65,13 +69,8 @@ def viewUpdatePais(request, id):
         pais.save()
         return redirect('/pais')
     else:
-        pais = PaisCurso.objects.get(id = id)
-        archivopais = open("ProyectoSennova/Templates/PaisCurso/update.html")
-        leer = Template(archivopais.read())
-        archivopais.close
-        parametros = Context({'pais' : pais})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        pais = PaisCurso(id = id)
+        return render(request, '/pais', {'pais' : pais})
 
 
 #endregion 
@@ -96,6 +95,9 @@ def insertDepartamento(request):
 
 
 def viewDepartamento(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     departamento = DepartamentoCurso.objects.select_related('paiscurso')
     archivo = open("ProyectoSennova/Templates/DepartamentoCurso/view.html")
     leer = Template(archivo.read())
@@ -111,7 +113,6 @@ def deleteDepartamento(request, id):
     return redirect('/departamento')
 
 
-@csrf_exempt
 def viewUpdateDepartamento(request, id):
     if request.method == "POST":
         departamento = DepartamentoCurso(id = id)
@@ -123,12 +124,7 @@ def viewUpdateDepartamento(request, id):
     else:
         departamento = DepartamentoCurso.objects.get(id = id)
         pais = PaisCurso.objects.all()
-        archivo = open("ProyectoSennova/Templates/DepartamentoCurso/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'departamento' : departamento, 'pais' : pais})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'DepartamentoCurso/update.html', {'departamento' : departamento, 'pais' : pais})
 
 #endregion
 
@@ -152,6 +148,9 @@ def insertMunicipio(request):
 
 
 def viewMunicipio(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     municipio = MunicipioCurso.objects.select_related('departamentocurso')
     archivo = open("ProyectoSennova/Templates/MunicipioCurso/view.html")
     leer = Template(archivo.read())
@@ -167,7 +166,6 @@ def deleteMunicipio(request, id):
     return redirect('/municipio/')
 
 
-@csrf_exempt
 def viewUpdateMunicipio(request, id):
     if request.method == "POST":
         municipio = MunicipioCurso(id = id)
@@ -179,12 +177,7 @@ def viewUpdateMunicipio(request, id):
     else:
         municipio = MunicipioCurso.objects.get(id = id)
         departamento = DepartamentoCurso.objects.all()
-        archivo = open("ProyectoSennova/Templates/MunicipioCurso/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'municipio' : municipio, 'departamento' : departamento})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'MunicipioCurso/update.html', {'municipio' : municipio, 'departamento' : departamento})
 
 #endregion
 
@@ -202,6 +195,9 @@ def insertRegional(request):
 
 
 def viewRegional(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     regional = Regional.objects.all()
     archivo = open("ProyectoSennova/Templates/Regional/view.html")
     leer = Template(archivo.read())
@@ -217,7 +213,6 @@ def deleteRegional(request, id):
     return redirect('/regional')
 
 
-@csrf_exempt
 def viewUpdateRegional(request, id):
     if request.method == "POST":
         regional = Regional(id = id)
@@ -226,12 +221,7 @@ def viewUpdateRegional(request, id):
         return redirect('/regional')
     else:
         regional = Regional.objects.get(id = id)
-        archivo = open("ProyectoSennova/Templates/Regional/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'regional' : regional})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Regional/update.html', {'regional' : regional})
 
 
 #endregion
@@ -252,6 +242,9 @@ def insertSector(request):
  
 
 def viewSector(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     sector = Sector.objects.all()
     archivo = open("ProyectoSennova/Templates/Sector/view.html")
     leer = Template(archivo.read())
@@ -268,7 +261,6 @@ def deleteSector(request, id):
 
 
 
-@csrf_exempt
 def viewUpdateSector(request, id):
     if request.method == "POST":
         sector = Sector(id = id)
@@ -278,12 +270,7 @@ def viewUpdateSector(request, id):
         return redirect('/sector')
     else:
         sector = Sector.objects.get(id = id)
-        archivo = open("ProyectoSennova/Templates/Sector/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'sector' : sector})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Sector/update.html', {'sector' : sector})
 
 #endregion
 
@@ -300,6 +287,9 @@ def insertJornada(request):
         return render(request, 'Jornada/insert.html')
 
 def viewJornada(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     jornada = Jornada.objects.all()
     archivo = open("ProyectoSennova/Templates/Jornada/view.html")
     leer = Template(archivo.read())
@@ -316,7 +306,6 @@ def deleteJornada(request, id):
 
 
 
-@csrf_exempt
 def viewUpdateJornada(request, id):
     if request.method == "POST":
         jornada = Jornada(id = id)
@@ -325,12 +314,7 @@ def viewUpdateJornada(request, id):
         return redirect('/jornada')
     else:
         jornada = Jornada.objects.get(id = id)
-        archivo = open("ProyectoSennova/Templates/Jornada/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'jornada' : jornada})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Jornada/update.html', {'jornada' : jornada})
 #endregion
 
 
@@ -349,6 +333,9 @@ def insertEmpresa(request):
         return render(request, 'Empresa/insert.html')
 
 def viewEmpresa(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     empresa = Empresa.objects.all()
     archivo = open("ProyectoSennova/Templates/Empresa/view.html")
     leer = Template(archivo.read())
@@ -364,7 +351,6 @@ def deleteEmpresa(request, id):
     return redirect('/empresa')
 
 
-@csrf_exempt
 def viewUpdateEmpresa(request, id):
     if request.method == "POST":
         empresa = Empresa(id = id)
@@ -376,12 +362,7 @@ def viewUpdateEmpresa(request, id):
         return redirect('/empresa')
     else:
         empresa = Empresa.objects.get(id = id)
-        archivo = open("ProyectoSennova/Templates/Empresa/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'empresa' : empresa})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Empresa/update.html', {'empresa' : empresa})
 #endregion
 
 
@@ -403,6 +384,9 @@ def insertCentro(request):
 
 
 def viewCentro(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     centro = Centro.objects.select_related('regional')
     archivo = open("ProyectoSennova/Templates/Centro/view.html")
     leer = Template(archivo.read())
@@ -418,7 +402,6 @@ def deleteCentro(request, id):
     return redirect('/centro')
 
 
-@csrf_exempt
 def viewUpdateCentro(request, id):
     if request.method == "POST":
         centro = Centro(id = id)
@@ -429,12 +412,7 @@ def viewUpdateCentro(request, id):
     else:
         centro = Centro.objects.get(id = id)
         regional = Regional.objects.all()
-        archivo = open("ProyectoSennova/Templates/Centro/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'centro' : centro, 'regional' : regional})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Centro/update.html', {'centro' : centro, 'regional' : regional})
 #endregion
 
 
@@ -457,6 +435,9 @@ def insertOcupacion(request):
 
 
 def viewOcupacion(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     ocupacion = Ocupacion.objects.select_related('sector')
     archivo = open("ProyectoSennova/Templates/Ocupacion/view.html")
     leer = Template(archivo.read())
@@ -472,7 +453,6 @@ def deleteOcupacion(request, id):
     return redirect('/ocupacion')
 
 
-@csrf_exempt
 def viewUpdateOcupacion(request, id):
     if request.method == "POST":
         ocupacion = Ocupacion(id = id)
@@ -484,12 +464,7 @@ def viewUpdateOcupacion(request, id):
     else:
         ocupacion = Ocupacion.objects.get(id = id)
         sector = Sector.objects.all()
-        archivo = open("ProyectoSennova/Templates/Ocupacion/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'ocupacion' : ocupacion, 'sector' : sector})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Ocupacion/update.html', {'ocupacion' : ocupacion, 'sector' : sector})
 #endregion
 
 
@@ -514,6 +489,9 @@ def insertConvenio(request):
 
 
 def viewConvenio(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     convenio = Convenio.objects.select_related('sector').select_related('empresa')
     archivo = open("ProyectoSennova/Templates/Convenio/view.html")
     leer = Template(archivo.read())
@@ -529,7 +507,6 @@ def deleteConvenio(request, id):
     return redirect('/convenio')
 
 
-@csrf_exempt
 def viewUpdateConvenio(request, id):
     if request.method == "POST":
         convenio = Convenio(id = id)
@@ -544,12 +521,7 @@ def viewUpdateConvenio(request, id):
         convenio = Convenio.objects.get(id = id)
         sector = Sector.objects.all()
         empresa = Empresa.objects.all()
-        archivo = open("ProyectoSennova/Templates/Convenio/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'convenio' : convenio, 'sector' : sector, 'empresa' : empresa})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Convenio/update.html', {'convenio' : convenio, 'sector' : sector, 'empresa' : empresa})
 #endregion
 
 
@@ -578,6 +550,9 @@ def insertCurso(request):
 
 
 def viewCurso(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     curso = Curso.objects.select_related('sector').select_related('jornada').select_related('municipiocurso')
     archivo = open("ProyectoSennova/Templates/Curso/view.html")
     leer = Template(archivo.read())
@@ -593,7 +568,6 @@ def deleteCurso(request, id):
     return redirect('/curso')
 
 
-@csrf_exempt
 def viewUpdateCurso(request, id):
     if request.method == "POST":
         curso = Curso(id = id)
@@ -611,12 +585,7 @@ def viewUpdateCurso(request, id):
         sector = Sector.objects.all()
         jornada = Jornada.objects.all()
         municipiocurso = MunicipioCurso.objects.all()
-        archivo = open("ProyectoSennova/Templates/Curso/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'curso' : curso, 'sector' : sector, 'jornada' : jornada, 'municipio' : municipiocurso})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Curso/update.html', {'curso' : curso, 'sector' : sector, 'jornada' : jornada, 'municipio' : municipiocurso})
 #endregion
 
 
@@ -641,6 +610,9 @@ def insertHora(request):
 
 
 def viewHora(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     horas = Horas.objects.select_related('ocupacion')
     archivo = open("ProyectoSennova/Templates/Horas/view.html")
     leer = Template(archivo.read())
@@ -656,7 +628,6 @@ def deleteHora(request, id):
     return redirect('/horas')
 
 
-@csrf_exempt
 def viewUpdateHoras(request, id):
     if request.method == "POST":
         horas = Horas(id = id)
@@ -671,12 +642,7 @@ def viewUpdateHoras(request, id):
     else:
         horas = Horas.objects.get(id = id)
         ocupacion = Ocupacion.objects.all()
-        archivo = open("ProyectoSennova/Templates/Horas/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'horas' : horas, 'ocupacion' : ocupacion})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request,'Horas/update.html', {'horas' : horas, 'ocupacion' : ocupacion})
 #endregion
 
 
@@ -699,6 +665,9 @@ def insertProgEsp(request):
 
 
 def viewProgEsp(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     programa = ProgramaEspecial.objects.select_related('sector')
     archivo = open("ProyectoSennova/Templates/ProgramaEspecial/view.html")
     leer = Template(archivo.read())
@@ -714,7 +683,6 @@ def deleteProgEsp(request, id):
     return redirect('/programaesp')
 
 
-@csrf_exempt
 def viewUpdateProgEsp(request, id):
     if request.method == "POST":
         programa = ProgramaEspecial(id = id)
@@ -726,12 +694,7 @@ def viewUpdateProgEsp(request, id):
     else:
         programa = ProgramaEspecial.objects.get(id = id)
         sector = Sector.objects.all()
-        archivo = open("ProyectoSennova/Templates/ProgramaEspecial/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'programa' : programa, 'sector' : sector})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'ProgramaEspecial/update.html', {'programa' : programa, 'sector' : sector})
 #endregion
 
 
@@ -762,6 +725,9 @@ def insertProgFor(request) :
 
 
 def viewProgFor(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     programa = ProgramaFormacion.objects.select_related('sector')
     archivo = open("ProyectoSennova/Templates/ProgramaFormacion/view.html")
     leer = Template(archivo.read())
@@ -777,7 +743,6 @@ def deleteProgFor(request, id):
     return redirect('/programafor')
 
 
-@csrf_exempt
 def viewUpdateProgFor(request, id):
     if request.method == "POST":
         programa = ProgramaFormacion(id = id)
@@ -794,15 +759,9 @@ def viewUpdateProgFor(request, id):
     else:
         programa = ProgramaFormacion.objects.get(id = id)
         sector = Sector.objects.all()
-        archivo = open("ProyectoSennova/Templates/ProgramaFormacion/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'programa' : programa, 'sector' : sector})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'ProgramaFormacion/update.html', {'programa' : programa, 'sector' : sector})
 
 
-@csrf_exempt
 def viewUpdateFileProgFor(request, id):
     if request.method == "POST":
         programa = ProgramaFormacion(id = id)
@@ -819,12 +778,7 @@ def viewUpdateFileProgFor(request, id):
     else:
         programa = ProgramaFormacion.objects.get(id = id)
         sector = Sector.objects.all()
-        archivo = open("ProyectoSennova/Templates/ProgramaFormacion/updateFile.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'programa' : programa, 'sector' : sector})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'ProgramaFormacion/update.html', {'programa' : programa, 'sector' : sector})
 
 
 def viewDetallesProgFor(request, id):
@@ -872,6 +826,9 @@ def insertFicha(request):
 
 
 def viewFicha(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     ficha = Ficha.objects.select_related('jornada').select_related('centro').select_related('programaformacion')
     archivo = open("ProyectoSennova/Templates/Ficha/view.html")
     leer = Template(archivo.read())
@@ -887,7 +844,6 @@ def deleteFicha(request, id):
     return redirect('/ficha')
 
 
-@csrf_exempt
 def viewUpdateFicha(request, id):
     if request.method == "POST":
         ficha = Ficha(id = id)
@@ -907,12 +863,8 @@ def viewUpdateFicha(request, id):
         centro = Centro.objects.all()
         programaformacion = ProgramaFormacion.objects.all()
         jornada = Jornada.objects.all()
-        archivo = open("ProyectoSennova/Templates/Ficha/update.html")
-        leer = Template(archivo.read())
-        archivo.close
         parametros = Context({'ficha' : ficha, 'centro' : centro, 'programa' : programaformacion, 'jornada' : jornada})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Ficha/update.html', {'ficha' : ficha, 'centro' : centro, 'programa' : programaformacion, 'jornada' : jornada} )
 
 
 def viewDetallesFicha(request, id):
@@ -974,6 +926,9 @@ def insertAprendiz(request):
 
 
 def viewAprendiz(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     aprendiz = Aprendiz.objects.select_related('ficha')
     archivo = open("ProyectoSennova/Templates/Aprendiz/view.html")
     leer = Template(archivo.read())
@@ -1181,6 +1136,9 @@ def insertContrato(request):
 
 
 def viewContrato(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
     contrato = Contrato.objects.select_related('empresa').select_related('aprendiz')
     archivo = open("ProyectoSennova/Templates/Contrato/view.html")
     leer = Template(archivo.read())
@@ -1370,5 +1328,43 @@ def viewDetallesContrato(request, id):
     parametros = Context({'aprendiz' : aprendiz, 'contrato' : contrato})
     paginalistado = leer.render(parametros)
     return HttpResponse(paginalistado)
+
+#endregion
+
+
+#region USUARIO
+def insertUsuario(request):
+    if request.method == "POST":
+        user = User.objects.create_user(
+            request.POST.get('username'),
+            request.POST.get('email'),
+            request.POST.get('password')
+        )
+        user.last_name = request.POST['last_name'],
+        user.first_name = request.POST['first_name'],
+        user.save()
+        
+        return redirect('/programafor')
+    else:
+        return render(request, "Usuario/insert.html")
+
+
+def loginUsuario(request):
+    if request.method == "POST":
+        user = authenticate(username = request.POST.get('username'), password = request.POST.get('password'))
+        
+        if user is not None:
+            login(request,user)
+            return redirect('/programafor')
+        else:
+            mensaje = 'Usuario o contraseña incorrecta'
+            return render(request, 'Usuario/login.html', {'mensaje' : mensaje})
+    else:
+        return render(request, 'Usuario/login.html')
+
+
+def logoutUsuario(request):
+    logout(request)
+    return redirect('/usuario/login')
 
 #endregion
