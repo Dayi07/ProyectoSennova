@@ -820,7 +820,7 @@ $(function () {
   }
 
   // Donut Chart
-  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------  
   var donutChartEl = document.querySelector('#donut-chart'),
     donutChartConfig = {
       chart: {
@@ -831,13 +831,12 @@ $(function () {
         show: true,
         position: 'bottom'
       },
-      labels: ['Operational', 'Networking', 'Hiring', 'R&D'],
-      series: [85, 16, 50, 50],
+      labels: ['Contratados', 'Disponibles', 'Terminados'],
+      series: [18, 30, 52],
       colors: [
         chartColors.donut.series1,
-        chartColors.donut.series5,
-        chartColors.donut.series3,
-        chartColors.donut.series2
+        chartColors.donut.series2,
+        chartColors.donut.series3
       ],
       dataLabels: {
         enabled: true,
@@ -864,9 +863,9 @@ $(function () {
               total: {
                 show: true,
                 fontSize: '1.5rem',
-                label: 'Operational',
+                label: 'Aprendices',
                 formatter: function (w) {
-                  return '31%';
+                  return '100%';
                 }
               }
             }

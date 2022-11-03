@@ -33,9 +33,9 @@
                                 <b>Encargado:</b> {{ ficha.FICHA_Nombre_Responsable }} <br>
                                 <b>Programa de formacion:</b> {{ ficha.programaformacion.PROGR_Nombre}} <br>
                                 <b>Jornada:</b> {{ ficha.jornada.JORNA_Nombre}} <br>
-                                <b>Centro:</b> {{ ficha.centro.CENTR_Nombre}} <br>
+                                <b>Centro:</b> {{ ficha.centro.CENTR_Nombre}} <br><br>
 
-                           </div>
+                                <a href="/ficha/reporte/{{ficha.id}}"> <button class="btn btn-primary" type="submit">Imprimir Reporte</button></a>                 
                        </div> 
                     </div>
                 </div>
@@ -68,17 +68,21 @@
                 </section>            
             </div>
 
-            <div class="card">
+
+            
+            <div class="card">     
+                {% if contrato %}
                 <div class="card-header">
-                    <h4 class="card-title"> Aprendices con contrato: </h4>
+                    <h4 class="card-title"> Aprendices contratados: </h4>
                 </div>
                 <section id="basic-datatable">
+               
                     <table class="datatables-basic table">
                         <thead> 
                             <tr>                                        
                                 <th>Aprendiz</th>
                                 <th>Estado del aprendiz</th>
-                                <th>Estado del contrato</th>
+                                <th>Estado del Contrato</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,19 +91,27 @@
                                 <td> {{ item.aprendiz.APREN_Nombre }} </td>
                                 <td> {{ item.CONT_Estado_Aprendiz }} </td>
                                 <td> {{ item.CONT_Estado_Contrato }} </td>
-                            </tr>
+                            </tr> 
                             {% endfor %}
                         </tbody>
-                    </table>                        
-                </section>            
+                    </table>  
+                    {% else %}
+                    <div class="card-header">
+                        <h4 class="card-title"> No hay Aprendices contratados </h4>
+                    </div>
+                </section>
+                {% endif %}
             </div>
-          
-            
-            <div class="card">
+
+
+
+            <div class="card">     
+                {% if sinContrato %}
                 <div class="card-header">
-                    <h4 class="card-title"> Aprendices sin contrato: </h4>
+                    <h4 class="card-title"> Aprendices disponibles: </h4>
                 </div>
                 <section id="basic-datatable">
+               
                     <table class="datatables-basic table">
                         <thead> 
                             <tr>                                        
@@ -114,12 +126,54 @@
                                 <td> {{ item.aprendiz.APREN_Nombre }} </td>
                                 <td> {{ item.CONT_Estado_Aprendiz }} </td>
                                 <td> {{ item.CONT_Estado_Contrato }} </td>
-                            </tr>
+                            </tr> 
                             {% endfor %}
                         </tbody>
-                    </table>                        
-                </section>            
+                    </table>  
+                    {% else %}
+                    <div class="card-header">
+                        <h4 class="card-title"> No hay Aprendices disponibles </h4>
+                    </div>
+                </section>
+                {% endif %}
             </div>
+            
+
+
+
+            <div class="card">     
+                {% if terminado %}
+                <div class="card-header">
+                    <h4 class="card-title"> Aprendices con contrato terminado: </h4>
+                </div>
+                <section id="basic-datatable">
+               
+                    <table class="datatables-basic table">
+                        <thead> 
+                            <tr>                                        
+                                <th>Aprendiz</th>
+                                <th>Estado del aprendiz</th>
+                                <th>Estado del Contrato</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in terminado %}
+                            <tr>
+                                <td> {{ item.aprendiz.APREN_Nombre }} </td>
+                                <td> {{ item.CONT_Estado_Aprendiz }} </td>
+                                <td> {{ item.CONT_Estado_Contrato }} </td>
+                            </tr> 
+                            {% endfor %}
+                        </tbody>
+                    </table>  
+                    {% else %}
+                    <div class="card-header">
+                        <h4 class="card-title"> No hay Aprendices con contrato terminado </h4>
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+            
 
 
              <!-- Donut Chart Starts-->
@@ -129,14 +183,37 @@
                         <h4 class="card-title mb-75">Expense Ratio</h4>
                         <span class="card-subtitle text-muted">Spending on various categories </span>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body">{{labels}} {{data}}
                         <div id="donut-chart"></div>
                     </div>
-                </div>
+                </div> 
             </div>
             <!-- Donut Chart Ends-->
            
+            
 
 
 {% include 'Inc/footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 
+<script type="text/javascript">
+  
+const ctx = document.getElementById('donut-chart');
+const config = {
+  type: 'donut',
+  data: {
+    datasets: [{
+        data: [10, 20, 30],
+        backgroundColor: ['#000']
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Red',
+        'Yellow',
+        'Blue'
+    ]
+    }
+};
+
+</script>

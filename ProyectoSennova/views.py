@@ -1,27 +1,23 @@
-from cmath import nan
 from contextvars import Context
-import encodings
-from genericpath import exists
-import imp
-from unicodedata import name
-from webbrowser import get
 from django.http import HttpResponse, JsonResponse
-import json
 from django.template import Template, Context
-import sqlalchemy
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.db import connection
 import pandas as pd   
-from flask_sqlalchemy import SQLAlchemy    
 from sqlalchemy import create_engine
 from django.views.decorators.csrf import csrf_exempt
 from shutil import rmtree
 import re
-from datetime import date, datetime
+from datetime import date
+import os
+from django.conf import settings
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib.staticfiles import finders
+from json import dumps
 
 #region PAIS CURSO
 def viewpais(request):
@@ -69,8 +65,8 @@ def viewUpdatePais(request, id):
         pais.save()
         return redirect('/pais')
     else:
-        pais = PaisCurso(id = id)
-        return render(request, '/pais', {'pais' : pais})
+        pais = PaisCurso.objects.get(id = id)
+        return render(request, 'PaisCurso/update.html', {'pais' : pais})
 
 
 #endregion 
@@ -776,9 +772,9 @@ def viewUpdateFileProgFor(request, id):
         programa.save()
         return redirect('/programafor')
     else:
-        programa = ProgramaFormacion.objects.get(id = id)
+        programa = ProgramaFormacion.objects.get(id = id) 
         sector = Sector.objects.all()
-        return render(request, 'ProgramaFormacion/update.html', {'programa' : programa, 'sector' : sector})
+        return render(request, 'ProgramaFormacion/updateFile.html', {'programa' : programa, 'sector' : sector})
 
 
 def viewDetallesProgFor(request, id):
@@ -863,7 +859,6 @@ def viewUpdateFicha(request, id):
         centro = Centro.objects.all()
         programaformacion = ProgramaFormacion.objects.all()
         jornada = Jornada.objects.all()
-        parametros = Context({'ficha' : ficha, 'centro' : centro, 'programa' : programaformacion, 'jornada' : jornada})
         return render(request, 'Ficha/update.html', {'ficha' : ficha, 'centro' : centro, 'programa' : programaformacion, 'jornada' : jornada} )
 
 
@@ -877,27 +872,39 @@ def viewDetallesFicha(request, id):
     #Se crean dos listas para guardar los aprendices con y sin contrato
     lista_contra = []
     lista_ncon = []
+    lista_term = []
+
 
     #Se recorren los aprendices asociados a la ficha seleccionada
-    for i in Aprendiz.objects.filter(ficha = ficha.id): 
-        contrato = Contrato.objects.get(aprendiz = i.id)
+    for i in Aprendiz.objects.filter(ficha = ficha.id):  
 
-        #Separamos los Aprendices sin contrato
-        if contrato.CONT_Estado_Aprendiz.strip() != 'Contratado':
-            lista_ncon.append(contrato)
+        if  Contrato.objects.filter(aprendiz = i.id):
+            contrato = Contrato.objects.get(aprendiz = i.id)            
 
-        #Separamos los Aprendices con contrato
-        if contrato.CONT_Estado_Aprendiz.strip() == 'Contratado':
-            lista_contra.append(contrato)  
+                #Separamos los Aprendices sin contrato
+            if contrato.CONT_Estado_Aprendiz.strip() != 'Contratado' and contrato.CONT_Estado_Aprendiz.strip() != 'Final Contrato':
+                lista_ncon.append(contrato)
+
+                #Separamos los Aprendices con contrato
+            if contrato.CONT_Estado_Aprendiz.strip() == 'Contratado' :
+                lista_contra.append(contrato)  
+
+            if contrato.CONT_Estado_Aprendiz.strip() == 'Final Contrato':
+                lista_term.append(contrato)  
+  
 
     archivo = open("ProyectoSennova/Templates/Ficha/detalles.html")
     leer = Template(archivo.read())
     archivo.close
 
+    labels = ['Contratado', 'Disponible', 'Terminado']
+    data = [len(lista_contra), len(lista_ncon), len(lista_term)]
+
     #Se envian las variables a la vista
-    parametros = Context({'ficha' : ficha, 'aprendiz' : aprendiz, 'contrato' : lista_contra, 'total_apre' : total_apre, 'sinContrato' : lista_ncon})
+    parametros = Context({'ficha' : ficha, 'aprendiz' : aprendiz, 'contrato' : lista_contra, 'total_apre' : total_apre, 'sinContrato' : lista_ncon, 'terminado' : lista_term, 'data' : data, 'labels' : labels})
     paginalistado = leer.render(parametros)
     return HttpResponse(paginalistado)
+
 
 #endregion
 
@@ -971,7 +978,6 @@ def viewUpdateAprendiz(request, id):
 
 
 
-@csrf_exempt
 def updateFotoAprendiz(request, id):
     if request.method == "POST" and request.FILES['APREN_Foto']:
         aprendiz = Aprendiz(id = id)
@@ -985,16 +991,11 @@ def updateFotoAprendiz(request, id):
         aprendiz.APREN_Foto = request.FILES.get('APREN_Foto')
         aprendiz.ficha = Ficha.objects.get(id = request.POST['ficha'])
         aprendiz.save()
-        return redirect('/aprendiz')
+        return redirect('/aprendiz/detalles/'+ str(id))
     else:
         aprendiz = Aprendiz.objects.get(id = id)
         ficha = Ficha.objects.all()
-        archivo = open("ProyectoSennova/Templates/Aprendiz/updateFoto.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'aprendiz' : aprendiz, 'ficha' : ficha})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Aprendiz/updateFoto.html', {'aprendiz' : aprendiz, 'ficha' : ficha})
 
 
 
@@ -1240,6 +1241,22 @@ def importarContrato(request):
                 )
                 new_ficha.save()
 
+            #Buscamos si ya existe la empresa y se guarda si ID en el Excel
+            if Empresa.objects.filter(EMPRE_Identificacion = busq_empresa):
+                empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
+                datos2.loc[i, 'empresa_id'] = empresa.id
+                print('empresaaa', busq_empresa, empresa.id) 
+            else:
+                #Si no encuentra la empresa crea una
+                empresa = Empresa(
+                    EMPRE_Tipo_Identificacion = 'NIT',
+                    EMPRE_Nombre = datos.loc[i, 'EMPRESA'],
+                    EMPRE_Identificacion = datos.loc[i, 'NIT']
+                )
+                empresa.save()
+                datos2.loc[i, 'empresa_id'] = empresa.id
+
+
 
             #Buscamos el aprendiz en la base de datos
             if Aprendiz.objects.filter(APREN_Documento = num):
@@ -1286,21 +1303,6 @@ def importarContrato(request):
                 )
                 aprendiz.save()                         
                 datos2.loc[i,'aprendiz_id'] = aprendiz.id
-
-            #Buscamos si ya existe la empresa y se guarda si ID en el Excel
-            if Empresa.objects.filter(EMPRE_Identificacion = busq_empresa):
-                empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
-                datos2.loc[i, 'empresa_id'] = empresa.id
-                print('empresaaa', busq_empresa, empresa.id) 
-            else:
-                #Si no encuentra la empresa crea una
-                empresa = Empresa(
-                    EMPRE_Tipo_Identificacion = 'NIT',
-                    EMPRE_Nombre = datos.loc[i, 'EMPRESA'],
-                    EMPRE_Identificacion = datos.loc[i, 'NIT']
-                )
-                empresa.save()
-                datos2.loc[i, 'empresa_id'] = empresa.id
 
         #Eliminamos las columnas que ya no sirven
         datos3 = datos2.drop(['APREN_Documento', 'FICHA'], axis=1)
@@ -1366,5 +1368,73 @@ def loginUsuario(request):
 def logoutUsuario(request):
     logout(request)
     return redirect('/usuario/login')
+
+#endregion
+
+
+#region REPORTE
+
+def reporteFicha(request, id):
+    template_path = 'Ficha/reporte.html'
+
+    ficha = Ficha.objects.get(id = id)
+    aprendiz = Aprendiz.objects.filter(ficha = ficha.id)
+
+    lista_contra = []
+    lista_ncon = []
+    lista_term = []
+
+    #Se recorren los aprendices asociados a la ficha seleccionada
+    for i in Aprendiz.objects.filter(ficha = ficha.id):  
+
+        if  Contrato.objects.filter(aprendiz = i.id):
+            contrato = Contrato.objects.get(aprendiz = i.id)            
+
+                #Separamos los Aprendices sin contrato
+            if contrato.CONT_Estado_Aprendiz.strip() != 'Contratado' and contrato.CONT_Estado_Aprendiz.strip() != 'Final Contrato':
+                lista_ncon.append(contrato)
+
+                #Separamos los Aprendices con contrato
+            if contrato.CONT_Estado_Aprendiz.strip() == 'Contratado' :
+                lista_contra.append(contrato)  
+
+            if contrato.CONT_Estado_Aprendiz.strip() == 'Final Contrato':
+                lista_term.append(contrato)  
+
+    parametros = {'ficha' : ficha, 'aprendiz' : aprendiz, 'contrato' : lista_contra,'sinContrato' : lista_ncon, 'terminado' : lista_term}
+   
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachmen; filename="Reporte de Aprendices.pdf"'
+    template = get_template(template_path)
+    html = template.render(parametros)
+    pisa_estatus = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    if pisa_estatus.err:
+        return HttpResponse("Error el cargar el reporte", html)
+    return response
+
+
+def link_callback(uri, rel):
+    result = finders.find(uri)
+    if result:
+            if not isinstance(result, (list, tuple)):
+                    result = [result]
+            result = list(os.path.realpath(path) for path in result)
+            path=result[0]
+    else:
+            sUrl = settings.STATIC_URL        # Typically /static/
+            sRoot = settings.STATIC_ROOT      # Typically /home/userX/project_static/
+            mUrl = settings.MEDIA_URL         # Typically /media/
+            mRoot = settings.MEDIA_ROOT       # Typically /home/userX/project_static/media/
+            if uri.startswith(mUrl):
+                    path = os.path.join(mRoot, uri.replace(mUrl, ""))
+            elif uri.startswith(sUrl):
+                    path = os.path.join(sRoot, uri.replace(sUrl, ""))
+            else:
+                    return uri
+    if not os.path.isfile(path):
+            raise Exception(
+                    'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+    return path
 
 #endregion

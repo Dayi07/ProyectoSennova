@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte</title>
+
+    <style>
+        h2, h1 {
+            text-align: center;
+        }
+    
+        td,th {
+            text-align: center;
+            width: auto;
+            height: 50px;
+        }
+    
+        table{
+            border-color: black;
+        }
+    
+    </style>
+    
+</head>
+
+<body>
+        <h1>Reporte de Aprendices {{ ficha.FICHA_Identificador_Unico }} - {{ ficha.programaformacion.PROGR_Nombre }}</h1>
+
+        <p>
+            <h3>Informacion de la ficha</h3>
+            <b>Encargado:</b> {{ ficha.FICHA_Nombre_Responsable }} <br>
+            <b>Etapa:</b> {{ ficha.FICHA_Etapa }} <br>
+            <b>Jornada:</b> {{ ficha.jornada.JORNA_Nombre}} <br>
+            <b>Centro:</b> {{ ficha.centro.CENTR_Nombre}} <br>
+            <b>Fecha de inicio:</b> {{ ficha.FICHA_Fecha_Inicio}} <br>
+            <b>Fecha de finalizacion:</b> {{ ficha.FICHA_Fecha_Terminacion}} <br>
+
+        </p>
+
+        <h2>Aprendices asociados a la Ficha</h2>
+        <table border="1">
+            <thead> 
+                <tr>                                        
+                    <th><br> Aprendiz</th>
+                    <th>Documento</th>
+                    <th>Correo</th>
+                    <th>Estado del Aprendiz</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in aprendiz %}
+                <tr>
+                    <td><br> {{ item.APREN_Nombre }} {{ item.APREN_Apellido }} </td>
+                    <td> {{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }} </td>
+                    <td> {{ item.APREN_Correo }} </td>
+                    <td> {{ item.APREN_Estado }} </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>   
+
+
+
+        {% if contrato %}
+        <br><br>
+        <h2>Aprendices con Contrato</h2>
+        <table border="1">
+            <thead> 
+                <tr>                                        
+                    <th><br> Aprendiz</th>
+                    <th>Estado del aprendiz</th>
+                    <th>Estado del contrato</th>
+                    <th>Empresa patrocinadora</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha terminacion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in contrato %}
+                <tr>
+                    <td><br> {{ item.aprendiz.APREN_Nombre }} </td>
+                    <td> {{ item.CONT_Estado_Aprendiz }} </td>
+                    <td> {{ item.CONT_Estado_Contrato }} </td>
+                    <td> {{ item.empresa.EMPRE_Nombre }} </td>
+                    <td> {{ item.CONT_Fecha_Inicio }} </td>
+                    <td> {{ item.CONT_Fecha_Terminacion }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>    
+        {% else %}
+        <br><br>
+        <h2>No hay Aprendices con Contrato</h2>
+        {% endif %}
+
+
+
+
+        {% if sinContrato %}
+        <br><br>
+        <h2>Aprendices sin Contrato</h2>
+        <table border="1">
+            <thead> 
+                <tr>                                        
+                    <th><br> Aprendiz</th>
+                    <th>Estado del aprendiz</th>
+                    <th>Estado del Contrato</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sinContrato %}
+                <tr>
+                    <td><br> {{ item.aprendiz.APREN_Nombre }} </td>
+                    <td> {{ item.CONT_Estado_Aprendiz }} </td>
+                    <td> {{ item.CONT_Estado_Contrato }} </td>
+                </tr> 
+                {% endfor %}
+            </tbody>
+        </table>   
+        {% else %}
+        <br><br>
+        <h2>No hay Aprendices sin Contrato</h2>
+        {% endif %}
+
+
+
+        
+        {% if terminado %}
+        <br><br>
+        <h2>Aprendices con Contrato Terminado</h2>
+        <table border="1">
+            <thead> 
+                <tr>                                        
+                    <th><br> Aprendiz</th>
+                    <th>Estado del aprendiz</th>
+                    <th>Estado del contrato</th>
+                    <th>Empresa patrocinadora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in terminado %}
+                <tr>
+                    <td><br> {{ item.aprendiz.APREN_Nombre }} </td>
+                    <td> {{ item.CONT_Estado_Aprendiz }} </td>
+                    <td> {{ item.CONT_Estado_Contrato }} </td>
+                    <td> {{ item.empresa.EMPRE_Nombre }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table> 
+        {% else %}
+        <br><br>
+        <h2>No hay Aprendices con Contrato Terminado</h2>
+        {% endif %}
+
+
+
+</body>
+</html>

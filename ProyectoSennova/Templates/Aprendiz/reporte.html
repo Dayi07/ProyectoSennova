@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte</title>
+</head>
+<body>
+        <h1>Reporte de Aprendices</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Documento</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Celular</th>
+                    <th>Correo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead> 
+            <tbody>
+                {% for item in aprendiz %}
+                <tr>
+                    <td>{{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }}</td>
+                    <td>{{ item.APREN_Nombre }} </td>
+                    <td>{{ item.APREN_Apellido }}</td>
+                    <td>{{ item.APREN_Celular }}</td>
+                    <td>{{ item.APREN_Correo }}</td>
+                    <td>{{ item.APREN_Estado }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+</body>
+</html>
