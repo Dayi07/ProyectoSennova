@@ -34,9 +34,7 @@
                                     <label for="PROGR_URL" class="form-label">PDF del programa</label>
                                     <input class="form-control" type="file" name="PROGR_URL" id="PROGR_URL" accept=".pdf" required/>
                                     <div class="invalid-tooltip">El PDF es obligatorio.</div> 
-                                </div> 
-                                <br>
-                                <div>
+    
                                     <input type="hidden"  id="PROGR_Nombre" name="PROGR_Nombre" value="{{ programa.PROGR_Nombre }}"/>
                                     <input type="hidden"  id="PROGR_Modalidad" name="PROGR_Modalidad" value="{{ programa.PROGR_Modalidad }}"/>
                                     <input type="hidden"  id="PROGR_Tipo_Formacion" name="PROGR_Tipo_Formacion" value="{{ programa.PROGR_Tipo_Formacion }}"/>
@@ -45,8 +43,8 @@
                                     <input type="hidden"  id="PROGR_Nivel" name="PROGR_Nivel" value="{{ programa.PROGR_Nivel }}"/>
                                     <input type="hidden"  id="PROGR_Nivel" name="PROGR_Nivel" value="{{ programa.PROGR_Nivel }}"/>
                                     <input type="hidden"  id="sector" name="sector" value="{{ programa.sector.id }}"/>
-                                </div>
-                             </div> 
+                                </div> 
+                            </div> <br>
                              <button class="btn btn-primary" type="submit">Guardar</button>
                          </div>
                      </div>

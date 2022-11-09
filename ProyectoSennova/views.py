@@ -879,18 +879,20 @@ def viewDetallesFicha(request, id):
     for i in Aprendiz.objects.filter(ficha = ficha.id):  
 
         if  Contrato.objects.filter(aprendiz = i.id):
-            contrato = Contrato.objects.get(aprendiz = i.id)            
+            contrato = Contrato.objects.filter(aprendiz = i.id)            
 
+            for n in contrato:
                 #Separamos los Aprendices sin contrato
-            if contrato.CONT_Estado_Aprendiz.strip() != 'Contratado' and contrato.CONT_Estado_Aprendiz.strip() != 'Final Contrato':
-                lista_ncon.append(contrato)
+                if n.CONT_Estado_Aprendiz.strip() != 'Contratado' and n.CONT_Estado_Aprendiz.strip() != 'Final Contrato':
+                    lista_ncon.append(n)
 
                 #Separamos los Aprendices con contrato
-            if contrato.CONT_Estado_Aprendiz.strip() == 'Contratado' :
-                lista_contra.append(contrato)  
+                if n.CONT_Estado_Aprendiz.strip() == 'Contratado':
+                    lista_contra.append(n)  
 
-            if contrato.CONT_Estado_Aprendiz.strip() == 'Final Contrato':
-                lista_term.append(contrato)  
+                #Separamos los Aprendices con contrato finalizado
+                if n.CONT_Estado_Aprendiz.strip() == 'Final Contrato':
+                    lista_term.append(n)  
   
 
     archivo = open("ProyectoSennova/Templates/Ficha/detalles.html")
@@ -951,7 +953,6 @@ def deleteAprendiz(request, id):
     return redirect('/aprendiz')
 
 
-@csrf_exempt
 def viewUpdateAprendiz(request, id):
     if request.method == "POST":
         aprendiz = Aprendiz(id = id)
@@ -969,12 +970,7 @@ def viewUpdateAprendiz(request, id):
     else:
         aprendiz = Aprendiz.objects.get(id = id)
         ficha = Ficha.objects.all()
-        archivo = open("ProyectoSennova/Templates/Aprendiz/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'aprendiz' : aprendiz, 'ficha' : ficha})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Aprendiz/update.html', {'aprendiz' : aprendiz, 'ficha' : ficha})
 
 
 
@@ -1023,7 +1019,6 @@ def importarAprendiz(request):
         busq = datos.loc[0,'APREN_Nombre']
         busq.split()
         ficha = re.split(r'\s+', busq)
-
 
 
         #Se busca en la clase la Ficha capturada si ya esta registrada se captura, si no esta registrada se guarda
@@ -1155,7 +1150,6 @@ def deleteContrato(request, id):
     return redirect('/contrato')
 
 
-@csrf_exempt
 def viewUpdateContrato(request, id):
     if request.method == "POST":
         contrato = Contrato(id = id)
@@ -1172,12 +1166,7 @@ def viewUpdateContrato(request, id):
         contrato = Contrato.objects.get(id = id)
         aprendiz = Aprendiz.objects.all()
         empresa = Empresa.objects.all()
-        archivo = open("ProyectoSennova/Templates/Contrato/update.html")
-        leer = Template(archivo.read())
-        archivo.close
-        parametros = Context({'contrato' : contrato, 'aprendiz' : aprendiz, 'empresa' : empresa})
-        paginalistado = leer.render(parametros)
-        return HttpResponse(paginalistado)
+        return render(request, 'Contrato/update.html', {'contrato' : contrato, 'aprendiz' : aprendiz, 'empresa' : empresa})
 
 
 
@@ -1237,7 +1226,7 @@ def importarContrato(request):
                     FICHA_Nombre_Responsable = 'Por definir',
                     jornada = Jornada(id = 1),
                     programaformacion = ProgramaFormacion(id = 1),
-                    centro = Centro(id = 1)                             #Los ID de las claves foreanes son predeterminados desde la base de datos 
+                    centro = Centro(id = 1)                             #Los ID de las claves foreanes son hechas desde la base de datos 
                 )
                 new_ficha.save()
 
@@ -1310,6 +1299,9 @@ def importarContrato(request):
         #Eliminamos las filas con los datos que ya estan registrados
         datos_completos = datos3.drop(lista, axis=0)
         
+        #Eliminamos la carpeta donde se almacenan los archivos
+        rmtree("/ProyectoSennova/media/Importar")  
+
         #Se gurdan los datos en la Base de datos        
         datos_completos.to_sql(name = 'Contrato', con = engine, if_exists = 'append', index=False)
 
@@ -1346,7 +1338,7 @@ def insertUsuario(request):
         user.first_name = request.POST['first_name'],
         user.save()
         
-        return redirect('/programafor')
+        return redirect('/pais')
     else:
         return render(request, "Usuario/insert.html")
 
@@ -1409,7 +1401,7 @@ def reporteFicha(request, id):
     html = template.render(parametros)
     pisa_estatus = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_estatus.err:
-        return HttpResponse("Error el cargar el reporte", html)
+        return HttpResponse("Error al cargar el reporte", html)
     return response
 
 

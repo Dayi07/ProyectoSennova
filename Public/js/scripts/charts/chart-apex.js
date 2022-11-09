@@ -7,6 +7,8 @@
     Author URL: http://www.themeforest.net/user/pixinvent
 ==========================================================================================*/
 
+
+
 $(function () {
   'use strict';
 
@@ -819,23 +821,24 @@ $(function () {
     radarChart.render();
   }
 
+
   // Donut Chart
   // --------------------------------------------------------------------  
-  var donutChartEl = document.querySelector('#donut-chart'),
+  var donutChartEl = document.querySelector('#donut-chart'),  
     donutChartConfig = {
       chart: {
         height: 350,
         type: 'donut'
-      },
+      }, 
       legend: {
         show: true,
         position: 'bottom'
       },
-      labels: ['Contratados', 'Disponibles', 'Terminados'],
-      series: [18, 30, 52],
+      labels: ['Contratados', 'Disponibles', 'Terminados'],   
+      series: window.data,
       colors: [
         chartColors.donut.series1,
-        chartColors.donut.series2,
+        chartColors.donut.series2,   
         chartColors.donut.series3
       ],
       dataLabels: {
