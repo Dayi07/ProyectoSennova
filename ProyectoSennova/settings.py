@@ -49,13 +49,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+]   
 
-MIDDLEWARE_CLASSES = (
-'django.middleware.common.CommonMiddleware',
-'django.contrib.sessions.middleware.SessionMiddleware',
-'django.middleware.csrf.CsrfViewMiddleware',
-)
+#MIDDLEWARE_CLASSES = (
+#'django.middleware.common.CommonMiddleware',
+#'django.contrib.sessions.middleware.SessionMiddleware',
+#'django.middleware.csrf.CsrfViewMiddleware',
+#)
 
 ROOT_URLCONF = 'ProyectoSennova.urls'
 
@@ -86,9 +86,9 @@ WSGI_APPLICATION = 'ProyectoSennova.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ProyectoSennova',
+        'NAME': 'ProyectoEtapa',
         'USER' : 'root',
-        'PASSWORD' : 'sena1234',
+        'PASSWORD' : '',
         'HOST' :'localhost',
         'PORT' : '3306',  
     }
@@ -131,13 +131,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    '/ProyectoSennova/Public',
+    'ProyectoSennova/Public',  
 ]
-
+ 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+MEDIA_ROOT = os.path.join('ProyectoSennova/media/')
+ 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'ProyectoSennova.User'

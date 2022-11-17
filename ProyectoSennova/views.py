@@ -1,14 +1,13 @@
 from contextvars import Context
 from django.http import HttpResponse, JsonResponse
 from django.template import Template, Context
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User 
 from django.contrib.auth import authenticate, login, logout
-from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector
+from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector, User
 from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.contrib import messages, auth
 import pandas as pd   
 from sqlalchemy import create_engine
-from django.views.decorators.csrf import csrf_exempt
 from shutil import rmtree
 import re
 from datetime import date
@@ -17,7 +16,6 @@ from django.conf import settings
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
-from json import dumps
 
 #region PAIS CURSO
 def viewpais(request):
@@ -359,6 +357,17 @@ def viewUpdateEmpresa(request, id):
     else:
         empresa = Empresa.objects.get(id = id)
         return render(request, 'Empresa/update.html', {'empresa' : empresa})
+
+def viewDetallesEmpresa(request, id):
+    empresa = Empresa.objects.get(id = id)
+    aprendiz = Contrato.objects.filter(empresa_id = id)
+    archivo = open("ProyectoSennova/Templates/Empresa/detalles.html")
+    leer = Template(archivo.read())
+    archivo.close
+    parametros = Context({'aprendiz' : aprendiz, 'empresa' : empresa})
+    paginalistado = leer.render(parametros)
+    return HttpResponse(paginalistado)
+
 #endregion
 
 
@@ -729,7 +738,7 @@ def viewProgFor(request):
     leer = Template(archivo.read())
     archivo.close
     parametros = Context({'programa' : programa})
-    paginalistado = leer.render(parametros)
+    paginalistado = leer.render(parametros)   
     return HttpResponse(paginalistado)
 
 
@@ -1007,7 +1016,7 @@ def importarAprendiz(request):
         url = 'http://127.0.0.1:8000/media/'+archivo
 
         #Se crea el engine(motor) con las especificaiones de la Base de Datos
-        engine = create_engine('mysql://root:sena1234@localhost/ProyectoSennova')
+        engine = create_engine('mysql://root@localhost/ProyectoEtapa')
 
         #Se hacen dos lecturas del documento excel
         #Uno con el documento completo para la captura de la Ficha
@@ -1034,8 +1043,8 @@ def importarAprendiz(request):
                 FICHA_Etapa = 'Por definir',
                 FICHA_Nombre_Responsable = 'Por definir',
                 jornada = Jornada(id = 1),
-                programaformacion = ProgramaFormacion(id = 18),
-                centro = Centro(id = 2)
+                programaformacion = ProgramaFormacion(id = 1),
+                centro = Centro(id = 1)
             )
             new_ficha.save()
             ficha_def = new_ficha
@@ -1053,39 +1062,33 @@ def importarAprendiz(request):
         for i in range(0, len(datos2)):
             #Se recorre la columna del Documento
             num = datos2.iloc[i]['APREN_Documento']
-            try:
-                #Buscamos el estado del Aprendiz en el documento
-                est = datos2.loc[i, 'APREN_Estado']
-                cor = datos2.loc[i, 'APREN_Correo']
-                cel = datos2.loc[i, 'APREN_Celular']
 
-                #Se busca si esta en la Base de Datos
-                if Aprendiz.objects.filter(APREN_Documento = num):
-                    aprendiz = Aprendiz.objects.get(APREN_Documento = num)
-                    lista.append(i)
-                    
-                    #Comparamos el estado del aprendiz, lo guardamos en caso de que sea diferente y se agrega el indice a la lista 
-                    if aprendiz.APREN_Estado != est:
-                        aprendiz.APREN_Estado = est
-                        aprendiz.save()
-                    
-                    if aprendiz.APREN_Correo != cor:
-                        aprendiz.APREN_Correo = cor
-                        aprendiz.save()
-
-                    if aprendiz.APREN_Celular != cel:
-                        aprendiz.APREN_Celular = cel
-                        aprendiz.save()
-
+            #Buscamos el estado del Aprendiz en el documento
+            est = datos2.loc[i, 'APREN_Estado']
+            cor = datos2.loc[i, 'APREN_Correo']
+            cel = datos2.loc[i, 'APREN_Celular']
+            #Se busca si esta en la Base de Datos
+            if Aprendiz.objects.filter(APREN_Documento = num):
+                aprendiz = Aprendiz.objects.get(APREN_Documento = num)
+                lista.append(i)
                 
-            except:
-                continue             
+                #Comparamos el estado del aprendiz, lo guardamos en caso de que sea diferente y se agrega el indice a la lista 
+                if aprendiz.APREN_Estado != est:
+                    aprendiz.APREN_Estado = est
+                    aprendiz.save()
+                
+                if aprendiz.APREN_Correo != cor:
+                    aprendiz.APREN_Correo = cor
+                    aprendiz.save()
+                if aprendiz.APREN_Celular != cel:
+                    aprendiz.APREN_Celular = cel
+                    aprendiz.save()        
 
         #Se borran las filas por medio de sus indices y se guarda en un nuevo DataFrame
         datos_completos = datos2.drop(lista, axis=0)
         
         #Se borra la carpeta donde se encuentra el Excel debido a que ya hizo la lectura
-        rmtree("/ProyectoSennova/media/Importar")  
+        rmtree("ProyectoSennova/media/Importar")  
         #Se guardan los datos del DataFrame en la Base de Datos          
         datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
     else:
@@ -1182,7 +1185,7 @@ def importarContrato(request):
         url = 'http://127.0.0.1:8000/media/'+archivo
 
         #Se crea el motor
-        engine = create_engine('mysql://root:sena1234@localhost/ProyectoSennova')
+        engine = create_engine('mysql://root@localhost/ProyectoEtapa')
 
         #Se hace la lectura del documento y se eliminan las columnas que no se necesitan 
         datos = pd.read_excel(io = url,  sheet_name=0, header=0, names=['TIPODOCUMENTO', 'APREN_Documento', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'CONT_Estado_Aprendiz', 'MOTIVO', 'FECHA1','FICHA', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'CONT_Fecha_Creacion', 'NIT', 'EMPRESA', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion', 'CONT_Estado_Contrato'], parse_dates=['CONT_Fecha_Creacion', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion'], index_col=None)
@@ -1234,7 +1237,6 @@ def importarContrato(request):
             if Empresa.objects.filter(EMPRE_Identificacion = busq_empresa):
                 empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
                 datos2.loc[i, 'empresa_id'] = empresa.id
-                print('empresaaa', busq_empresa, empresa.id) 
             else:
                 #Si no encuentra la empresa crea una
                 empresa = Empresa(
@@ -1254,29 +1256,31 @@ def importarContrato(request):
 
                 #Buscamos si ya existe un contrato asociado a ese aprendiz
                 if Contrato.objects.filter(aprendiz = aprendiz.id):
-                    contrato = Contrato.objects.get(aprendiz = aprendiz.id)
-                    lista.append(i)
+                    for u in Contrato.objects.filter(aprendiz = aprendiz.id):
+                        print('contratooooooooooooooooooooo' , Contrato.objects.filter(aprendiz = aprendiz.id))
+                        #contrato = Contrato.objects.get(aprendiz = aprendiz.id)
+                        lista.append(i)
 
-                    #Se comparan todos los datos y si hay algun cambio se actualiza
-                    if contrato.CONT_Estado_Aprendiz != est_aprendiz:
-                        contrato.CONT_Estado_Aprendiz = est_aprendiz
-                        contrato.save() 
+                        #Se comparan todos los datos y si hay algun cambio se actualiza
+                        if u.CONT_Estado_Aprendiz != est_aprendiz:
+                            u.CONT_Estado_Aprendiz = est_aprendiz
+                            u.save() 
 
-                    if contrato.CONT_Estado_Contrato != est_contrato and est_contrato != 'vacio':
-                        contrato.CONT_Estado_Contrato = est_contrato
-                        contrato.save()  
+                        if u.CONT_Estado_Contrato != est_contrato and est_contrato != 'vacio':
+                            u.CONT_Estado_Contrato = est_contrato
+                            u.save()  
 
-                    if contrato.CONT_Fecha_Inicio != fec_inicio and fec_inicio != 'vacio':
-                        contrato.CONT_Fecha_Inicio = fec_inicio
-                        contrato.save()
+                        if u.CONT_Fecha_Inicio != fec_inicio and fec_inicio != 'vacio':
+                            u.CONT_Fecha_Inicio = fec_inicio
+                            u.save()
 
-                    if contrato.CONT_Fecha_Terminacion != fec_final and fec_final != 'vacio': 
-                        contrato.CONT_Fecha_Terminacion = fec_final
-                        contrato.save()    
+                        if u.CONT_Fecha_Terminacion != fec_final and fec_final != 'vacio': 
+                            u.CONT_Fecha_Terminacion = fec_final
+                            u.save()    
 
-                    if contrato.empresa.EMPRE_Identificacion != busq_empresa:
-                        contrato.empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
-                        contrato.save()
+                        if u.empresa.EMPRE_Identificacion != busq_empresa:
+                            u.empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
+                            u.save()
             else:
                 #Si no encuentra el Aprendiz se crea uno con los datos del Excel
                 aprendiz = Aprendiz(
@@ -1300,7 +1304,7 @@ def importarContrato(request):
         datos_completos = datos3.drop(lista, axis=0)
         
         #Eliminamos la carpeta donde se almacenan los archivos
-        rmtree("/ProyectoSennova/media/Importar")  
+        rmtree("ProyectoSennova/media/Importar")  
 
         #Se gurdan los datos en la Base de datos        
         datos_completos.to_sql(name = 'Contrato', con = engine, if_exists = 'append', index=False)
@@ -1338,18 +1342,20 @@ def insertUsuario(request):
         user.first_name = request.POST['first_name'],
         user.save()
         
-        return redirect('/pais')
+        return redirect('/index')
     else:
         return render(request, "Usuario/insert.html")
 
 
 def loginUsuario(request):
     if request.method == "POST":
-        user = authenticate(username = request.POST.get('username'), password = request.POST.get('password'))
-        
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username = username, password = password)
+
         if user is not None:
-            login(request,user)
-            return redirect('/programafor')
+            login(request, user)
+            return redirect('/index')      
         else:
             mensaje = 'Usuario o contraseña incorrecta'
             return render(request, 'Usuario/login.html', {'mensaje' : mensaje})
@@ -1360,6 +1366,15 @@ def loginUsuario(request):
 def logoutUsuario(request):
     logout(request)
     return redirect('/usuario/login')
+
+
+def viewIndex(request):
+    archivo = open("ProyectoSennova/Templates/Usuario/index.html")
+    leer = Template(archivo.read())
+    archivo.close
+    parametros = Context({})
+    paginalistado = leer.render(parametros) 
+    return HttpResponse(paginalistado)
 
 #endregion
 
@@ -1409,7 +1424,7 @@ def link_callback(uri, rel):
     result = finders.find(uri)
     if result:
             if not isinstance(result, (list, tuple)):
-                    result = [result]
+                    result = [result] 
             result = list(os.path.realpath(path) for path in result)
             path=result[0]
     else:
@@ -1430,3 +1445,7 @@ def link_callback(uri, rel):
     return path
 
 #endregion
+
+
+
+

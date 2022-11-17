@@ -25,6 +25,15 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
+
+                            {{user}}
+                            {% if user is not None  %}
+                                <p>User is logged in :)</p>
+                                <p>Username -->  {{ user.username }}</p>
+                            {% else %}
+                                <p>User is not logged in :(</p>
+                            {% endif %}
+
                             <table class="datatables-basic table">
                                 <thead>
                                     <tr>

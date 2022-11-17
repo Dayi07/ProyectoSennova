@@ -24,7 +24,7 @@ from ProyectoSennova.views import insertDepartamento, viewDepartamento, deleteDe
 from ProyectoSennova.views import insertRegional, viewRegional, deleteRegional, viewUpdateRegional                                                                #REGIONAL
 from ProyectoSennova.views import insertSector, viewSector, deleteSector, viewUpdateSector                                                                        #SECTOR
 from ProyectoSennova.views import insertJornada, viewJornada, deleteJornada, viewUpdateJornada                                                                    #JORNADA
-from ProyectoSennova.views import insertEmpresa, viewEmpresa, deleteEmpresa, viewUpdateEmpresa                                                                    #EMPRESA
+from ProyectoSennova.views import insertEmpresa, viewEmpresa, deleteEmpresa, viewUpdateEmpresa, viewDetallesEmpresa                                               #EMPRESA
 from ProyectoSennova.views import insertMunicipio, viewMunicipio, deleteMunicipio, viewUpdateMunicipio                                                            #MUNICIPIO
 from ProyectoSennova.views import insertCentro, viewCentro, deleteCentro, viewUpdateCentro                                                                        #CENTRO
 from ProyectoSennova.views import insertOcupacion, viewOcupacion, deleteOcupacion, viewUpdateOcupacion                                                            #OCUPACION
@@ -33,10 +33,10 @@ from ProyectoSennova.views import insertCurso, viewCurso, deleteCurso, viewUpdat
 from ProyectoSennova.views import insertHora, viewHora, deleteHora, viewUpdateHoras                                                                               #HORA
 from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, viewUpdateProgEsp                                                                    #PROGRAMA ESPECIAL
 from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor, viewDetallesProgFor                        #PROGRAMA FORMACION
-from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetallesFicha                                                         #FICHA
+from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetallesFicha, reporteFicha                                                         #FICHA
 from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz, viewDetallesAprendiz    #APRENDIZ
 from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato, viewDetallesContrato                        #Contrato
-from ProyectoSennova.views import insertUsuario, loginUsuario, logoutUsuario, reporteFicha
+from ProyectoSennova.views import insertUsuario, loginUsuario, logoutUsuario, viewIndex
 
 
 
@@ -63,7 +63,7 @@ urlpatterns = [
     path('sector/delete/<int:id>', deleteSector, name='deleteSector'),
     path('sector/update/<int:id>', viewUpdateSector, name='updateSector'),
 
-    path('jornada', viewJornada),
+    path('jornada/', viewJornada),
     path('jornada/insert/', insertJornada),
     path('jornada/delete/<int:id>', deleteJornada, name='deleteJornada'),
     path('jornada/update/<int:id>', viewUpdateJornada, name='updateJornada'),
@@ -72,6 +72,8 @@ urlpatterns = [
     path('empresa/', viewEmpresa),
     path('empresa/delete/<int:id>', deleteEmpresa, name='deleteEmpresa'),
     path('empresa/update/<int:id>', viewUpdateEmpresa, name='updateEmpresa'),
+    path('empresa/update/<int:id>', viewUpdateEmpresa, name='updateEmpresa'),
+    path('empresa/detalles/<int:id>', viewDetallesEmpresa, name='detallesEmpresa' ),
 
     path('municipio/insert/', insertMunicipio),
     path('municipio/', viewMunicipio),
@@ -139,12 +141,13 @@ urlpatterns = [
     path('usuario/insert', insertUsuario, name='insertUsuario'),
     path('usuario/login', loginUsuario, name='loginUsuario'),
     path('usuario/logout', logoutUsuario, name='logoutUsuario'),
+    path('index/', viewIndex, name='viewIndex'),
+
 
     path('ficha/reporte/<int:id>', reporteFicha, name='reporteFicha'),
 
 
 ] 
+ 
 
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  
