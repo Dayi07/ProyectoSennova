@@ -4,7 +4,16 @@ from django.db import connection, models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
+    INSTRUCTOR = 1
+    ADMINISTRADOR = 2
+      
+    ROLE_CHOICES = (
+      (INSTRUCTOR, 'Instructor'),
+      (ADMINISTRADOR, 'Administrador'),
+    )    
     foto = models.ImageField(upload_to='User/', blank=True, null=True)
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
+
 
 class PaisCurso(models.Model):
     PAISC_Nombre = models.CharField(max_length=50) 
@@ -21,7 +30,7 @@ class DepartamentoCurso(models.Model):
         )  
     class Meta:
         db_table = 'Departamento_Curso'
-
+    
 
 
 class MunicipioCurso(models.Model):
@@ -39,7 +48,7 @@ class Regional(models.Model):
     REGIO_Nombre = models.CharField(max_length=50)
     class Meta:
         db_table = 'Regional'
-
+    
 
 
 class Sector(models.Model):

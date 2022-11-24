@@ -138,16 +138,16 @@ urlpatterns = [
     path('contrato/import/', importarContrato, name='importarContrato'),
     path('contrato/detalles/<int:id>', viewDetallesContrato, name='viewDetallesContrato' ),
 
-    path('usuario/insert', insertUsuario, name='insertUsuario'),
-    path('usuario/login', loginUsuario, name='loginUsuario'),
-    path('usuario/logout', logoutUsuario, name='logoutUsuario'),
+    path('accounts/insert/', insertUsuario, name='insertUsuario'),
+    path('accounts/login/', loginUsuario, name='loginUsuario'),
+    path('accounts/logout/', logoutUsuario, name='logoutUsuario'),
     path('index/', viewIndex, name='viewIndex'),
 
 
-    path('ficha/reporte/<int:id>', reporteFicha, name='reporteFicha'),
+    path('ficha/reporte/<int:id>', reporteFicha, name='reporteFicha'),  
 
 
-] 
+]   
  
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  

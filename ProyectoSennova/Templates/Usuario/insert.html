@@ -29,7 +29,7 @@
                                
                                 <section id="basic-input" class="tootip-validations">                     
 
-                                <form class="needs-validation" method="POST"  novalidate>
+                                <form class="needs-validation" method="POST" enctype="multipart/form-data"  novalidate>
                                     {% csrf_token %}
 
                                     <div class="mb-1">
@@ -64,7 +64,7 @@
                                 </form>
                                 </section>
 
-                                <p class="text-center mt-2"><span>Ya tienes una cuenta?</span><a href="/usuario/login"><span>&nbsp;Ingresa aqui</span></a></p>
+                                <p class="text-center mt-2"><span>Ya tienes una cuenta?</span><a href="/accounts/login/"><span>&nbsp;Ingresa aqui</span></a></p>
                             </div>
                         </div>
                         <!-- /Register-->

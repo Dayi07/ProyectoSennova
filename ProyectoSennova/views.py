@@ -1,23 +1,30 @@
-from contextvars import Context
 from django.http import HttpResponse, JsonResponse
-from django.template import Template, Context
-#from django.contrib.auth.models import User 
 from django.contrib.auth import authenticate, login, logout
-from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector, User
 from django.shortcuts import render, redirect
-from django.contrib import messages, auth
-import pandas as pd   
-from sqlalchemy import create_engine
-from shutil import rmtree
-import re
-from datetime import date
-import os
+from django.contrib import messages
 from django.conf import settings
 from django.template.loader import get_template
-from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
+from django.views.generic import View
+from django.contrib.auth.decorators import permission_required, login_required
+from sqlalchemy import create_engine
+from shutil import rmtree
+from xhtml2pdf import pisa
+from datetime import date
+from contextvars import Context
+import pandas as pd   
+import re
+import os
+#from django.contrib.auth.models import User 
+from ProyectoSennova.models import Aprendiz, Centro, Contrato, Convenio, Curso, DepartamentoCurso, Empresa, Ficha, Horas, Importar, Jornada, MunicipioCurso, Ocupacion, PaisCurso, ProgramaEspecial, ProgramaFormacion, Regional, Sector, User
+from django.template import Template, Context
+ 
+
+
+
 
 #region PAIS CURSO
+@login_required(redirect_field_name='')
 def viewpais(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -31,116 +38,146 @@ def viewpais(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
 def insertpais(request):
-    if request.method == "POST":
-        if request.POST.get('PAISC_Nombre'):
-            pais = PaisCurso()
-            pais.PAISC_Nombre = request.POST.get('PAISC_Nombre')
-            pais.save()
-            #insertar = connection.cursor()
-            #insertar.execute("call InsertarPaisCurso('"+pais.PAISC_Nombre+"')")
-            return redirect('/pais')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('PAISC_Nombre'):
+                pais = PaisCurso()
+                pais.PAISC_Nombre = request.POST.get('PAISC_Nombre')
+                pais.save()
+                #insertar = connection.cursor()
+                #insertar.execute("call InsertarPaisCurso('"+pais.PAISC_Nombre+"')")
+                return redirect('/pais')
+        else:
+            messages.success(request, "El pais no se guardo correctamente")
+            return render(request, 'PaisCurso/insert.html')
     else:
-        messages.success(request, "El pais no se guardo correctamente")
-        return render(request, 'PaisCurso/insert.html')
+        return redirect('/pais')
 
 
 def resuljson(request):
     data = list(PaisCurso.objects.values())   
     return JsonResponse({'data' : data})
-    
-  
+
+   
+@login_required(redirect_field_name='')
 def deletepais(request, id):
-    pais = PaisCurso.objects.get(id = id)
-    pais.delete()
-    return redirect('/pais')
-
-
-def viewUpdatePais(request, id):
-    if request.method == "POST":
-        pais = PaisCurso(id = id)
-        pais.PAISC_Nombre = request.POST.get('PAISC_Nombre')
-        pais.save()
+    if request.user.role == 2:
+        pais = PaisCurso.objects.get(id = id)
+        pais.delete()
         return redirect('/pais')
     else:
-        pais = PaisCurso.objects.get(id = id)
-        return render(request, 'PaisCurso/update.html', {'pais' : pais})
+        return redirect('/pais')
+
+
+@login_required(redirect_field_name='')
+def viewUpdatePais(request, id):
+    if request.user.role == 2:
+        if request.method == "POST":
+            pais = PaisCurso(id = id)
+            pais.PAISC_Nombre = request.POST.get('PAISC_Nombre')
+            pais.save()
+            return redirect('/pais')
+        else:
+            pais = PaisCurso.objects.get(id = id)
+            return render(request, 'PaisCurso/update.html', {'pais' : pais})
+    else:
+        return redirect('/pais')
 
 
 #endregion 
 
 
 #region DEPARTAMENTO CURSO
-
+@login_required(redirect_field_name='')
 def insertDepartamento(request):
-    if request.method == "POST":
-        if request.POST.get('DEPAR_Nombre'):            
-            departamento = DepartamentoCurso(
-                DEPAR_Nombre = request.POST['DEPAR_Nombre'],
-                paiscurso = PaisCurso.objects.get(id = request.POST['paiscurso'])
-                ) 
-            departamento.save()
-            return redirect('/departamento/')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('DEPAR_Nombre'):            
+                departamento = DepartamentoCurso(
+                    DEPAR_Nombre = request.POST['DEPAR_Nombre'],
+                    paiscurso = PaisCurso.objects.get(id = request.POST['paiscurso'])
+                    ) 
+                departamento.save()
+                return redirect('/departamento/')
+        else:
+            #objetos de pais
+            pais = PaisCurso.objects.all()
+            parametros = dict({'pais' : pais})
+            return render(request, 'DepartamentoCurso/insert.html', parametros)
     else:
-        #objetos de pais
-        pais = PaisCurso.objects.all()
-        parametros = dict({'pais' : pais})
-        return render(request, 'DepartamentoCurso/insert.html', parametros)
+        return redirect('/departamento/')
 
-
+    
+@login_required(redirect_field_name='')
 def viewDepartamento(request):
-    if not request.user.is_authenticated:  
-        return redirect('/usuario/login')
+        if not request.user.is_authenticated:  
+            return redirect('/usuario/login')
 
-    departamento = DepartamentoCurso.objects.select_related('paiscurso')
-    archivo = open("ProyectoSennova/Templates/DepartamentoCurso/view.html")
-    leer = Template(archivo.read())
-    archivo.close
-    parametros = Context({'departamento' : departamento})
-    paginalistado = leer.render(parametros)
-    return HttpResponse(paginalistado)
+        departamento = DepartamentoCurso.objects.select_related('paiscurso')
+        archivo = open("ProyectoSennova/Templates/DepartamentoCurso/view.html")
+        leer = Template(archivo.read())
+        archivo.close
+        parametros = Context({'departamento' : departamento})
+        paginalistado = leer.render(parametros)
+        return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
 def deleteDepartamento(request, id):
-    departamento = DepartamentoCurso.objects.get(id = id)
-    departamento.delete()
-    return redirect('/departamento')
-
-
-def viewUpdateDepartamento(request, id):
-    if request.method == "POST":
-        departamento = DepartamentoCurso(id = id)
-        departamento.DEPAR_Nombre = request.POST.get('DEPAR_Nombre')
-        departamento.paiscurso = PaisCurso.objects.get(id = request.POST['paiscurso'])
-
-        departamento.save()
+    if request.user.role == 2:
+        departamento = DepartamentoCurso.objects.get(id = id)
+        departamento.delete()
         return redirect('/departamento')
     else:
-        departamento = DepartamentoCurso.objects.get(id = id)
-        pais = PaisCurso.objects.all()
-        return render(request, 'DepartamentoCurso/update.html', {'departamento' : departamento, 'pais' : pais})
+        return redirect('/departamento/')
+
+
+@login_required(redirect_field_name='')
+def viewUpdateDepartamento(request, id):
+    if request.user.role == 2:
+        if request.method == "POST":
+            departamento = DepartamentoCurso(id = id)
+            departamento.DEPAR_Nombre = request.POST.get('DEPAR_Nombre')
+            departamento.paiscurso = PaisCurso.objects.get(id = request.POST['paiscurso'])
+
+            departamento.save()
+            return redirect('/departamento')
+        else:
+            departamento = DepartamentoCurso.objects.get(id = id)
+            pais = PaisCurso.objects.all()
+            return render(request, 'DepartamentoCurso/update.html', {'departamento' : departamento, 'pais' : pais})
+    else:
+        return redirect('/departamento/')
+    
 
 #endregion
 
 
 #region MUNICIPIO CURSO
 
+@login_required(redirect_field_name='')
 def insertMunicipio(request):
-    if request.method == "POST":
-        if request.POST.get('MUNIC_Nombre'):            
-            municipio = MunicipioCurso(
-                MUNIC_Nombre = request.POST['MUNIC_Nombre'],
-                departamentocurso = DepartamentoCurso.objects.get(id = request.POST['departamentocurso'])
-                ) 
-            municipio.save()
-            return redirect('/municipio/')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('MUNIC_Nombre'):            
+                municipio = MunicipioCurso(
+                    MUNIC_Nombre = request.POST['MUNIC_Nombre'],
+                    departamentocurso = DepartamentoCurso.objects.get(id = request.POST['departamentocurso'])
+                    ) 
+                municipio.save()
+                return redirect('/municipio/')
+        else:
+            #objetos de departamento
+            departamento = DepartamentoCurso.objects.all()
+            parametros = dict({'departamento' : departamento})
+            return render(request, 'MunicipioCurso/insert.html', parametros)
     else:
-        #objetos de departamento
-        departamento = DepartamentoCurso.objects.all()
-        parametros = dict({'departamento' : departamento})
-        return render(request, 'MunicipioCurso/insert.html', parametros)
+        return redirect('/municipio/')
 
 
+@login_required(redirect_field_name='')
 def viewMunicipio(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -154,12 +191,16 @@ def viewMunicipio(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_municipiocurso', login_url=None)
 def deleteMunicipio(request, id):
     municipio = MunicipioCurso.objects.get(id = id)
     municipio.delete()
     return redirect('/municipio/')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_municipiocurso', login_url=None)
 def viewUpdateMunicipio(request, id):
     if request.method == "POST":
         municipio = MunicipioCurso(id = id)
@@ -177,17 +218,23 @@ def viewUpdateMunicipio(request, id):
 
 
 #region REGIONAL
+    
+@login_required(redirect_field_name='')
 def insertRegional(request):
-    if request.method == "POST":
-        if request.POST.get('REGIO_Nombre'):
-            regional = Regional()
-            regional.REGIO_Nombre = request.POST.get('REGIO_Nombre')
-            regional.save()
-            return redirect('/regional')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('REGIO_Nombre'):
+                regional = Regional()
+                regional.REGIO_Nombre = request.POST.get('REGIO_Nombre')
+                regional.save()
+                return redirect('/regional')
+        else:
+            return render(request, 'Regional/insert.html')
     else:
-        return render(request, 'Regional/insert.html')
+        return redirect('/regional')
 
 
+@login_required(redirect_field_name='')
 def viewRegional(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -201,21 +248,29 @@ def viewRegional(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
 def deleteRegional(request, id):
-    regional = Regional.objects.get(id = id)
-    regional.delete()
-    return redirect('/regional')
-
-
-def viewUpdateRegional(request, id):
-    if request.method == "POST":
-        regional = Regional(id = id)
-        regional.REGIO_Nombre = request.POST.get('REGIO_Nombre')
-        regional.save()
+    if request.user.role == 2:
+        regional = Regional.objects.get(id = id)
+        regional.delete()
         return redirect('/regional')
     else:
-        regional = Regional.objects.get(id = id)
-        return render(request, 'Regional/update.html', {'regional' : regional})
+        return redirect('/regional')
+
+
+@login_required(redirect_field_name='')
+def viewUpdateRegional(request, id):
+    if request.user.role == 2:
+        if request.method == "POST":
+            regional = Regional(id = id)
+            regional.REGIO_Nombre = request.POST.get('REGIO_Nombre')
+            regional.save()
+            return redirect('/regional')
+        else:
+            regional = Regional.objects.get(id = id)
+            return render(request, 'Regional/update.html', {'regional' : regional})
+    else:
+        return redirect('/regional')
 
 
 #endregion
@@ -223,18 +278,22 @@ def viewUpdateRegional(request, id):
 
 #region SECTOR
 
+@login_required(redirect_field_name='')
 def insertSector(request):
-    if request.method == "POST":
-        if request.POST.get('SECTO_Nombre', 'SECTO_Nombre'):
-            sector = Sector()
-            sector.SECTO_Nombre = request.POST.get('SECTO_Nombre')
-            sector.SECTO_NombreNuevo = request.POST.get('SECTO_NombreNuevo')
-            sector.save()
-            return redirect('/sector')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('SECTO_Nombre', 'SECTO_Nombre'):
+                sector = Sector()
+                sector.SECTO_Nombre = request.POST.get('SECTO_Nombre')
+                sector.SECTO_NombreNuevo = request.POST.get('SECTO_NombreNuevo')
+                sector.save()
+                return redirect('/sector')
+        else:
+            return render(request, 'Sector/insert.html')
     else:
-        return render(request, 'Sector/insert.html')
- 
+        return redirect('/sector')
 
+@login_required(redirect_field_name='')
 def viewSector(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -248,38 +307,51 @@ def viewSector(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
 def deleteSector(request, id):
-    sector = Sector.objects.get(id = id)
-    sector.delete()
-    return redirect('/sector')
-
-
-
-def viewUpdateSector(request, id):
-    if request.method == "POST":
-        sector = Sector(id = id)
-        sector.SECTO_Nombre = request.POST.get('SECTO_Nombre')
-        sector.SECTO_NombreNuevo = request.POST.get('SECTO_NombreNuevo')
-        sector.save()
+    if request.user.role == 2:
+        sector = Sector.objects.get(id = id)
+        sector.delete()
         return redirect('/sector')
     else:
-        sector = Sector.objects.get(id = id)
-        return render(request, 'Sector/update.html', {'sector' : sector})
+        return redirect('/sector')
+
+@login_required(redirect_field_name='')
+def viewUpdateSector(request, id):
+    if request.user.role == 2:
+        if request.method == "POST":
+            sector = Sector(id = id)
+            sector.SECTO_Nombre = request.POST.get('SECTO_Nombre')
+            sector.SECTO_NombreNuevo = request.POST.get('SECTO_NombreNuevo')
+            sector.save()
+            return redirect('/sector')
+        else:
+            sector = Sector.objects.get(id = id)
+            return render(request, 'Sector/update.html', {'sector' : sector})
+    else:
+        return redirect('/sector')
 
 #endregion
 
 
 #region JORNADA
+    
+@login_required(redirect_field_name='')
 def insertJornada(request):
-    if request.method == "POST":
-        if request.POST.get('JORNA_Nombre'):
-            jornada = Jornada()
-            jornada.JORNA_Nombre = request.POST.get('JORNA_Nombre')
-            jornada.save()
-            return redirect('/jornada')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('JORNA_Nombre'):
+                jornada = Jornada()
+                jornada.JORNA_Nombre = request.POST.get('JORNA_Nombre')
+                jornada.save()
+                return redirect('/jornada')
+        else:
+            return render(request, 'Jornada/insert.html')
     else:
-        return render(request, 'Jornada/insert.html')
+        return redirect('/jornada')
 
+    
+@login_required(redirect_field_name='')
 def viewJornada(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -293,71 +365,94 @@ def viewJornada(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
 def deleteJornada(request, id):
-    jornada = Jornada.objects.get(id = id)
-    jornada.delete()
-    return redirect('/jornada')
-
-
-
-def viewUpdateJornada(request, id):
-    if request.method == "POST":
-        jornada = Jornada(id = id)
-        jornada.JORNA_Nombre = request.POST.get('JORNA_Nombre')
-        jornada.save()
+    if request.user.role == 2:
+        jornada = Jornada.objects.get(id = id)
+        jornada.delete()
         return redirect('/jornada')
     else:
-        jornada = Jornada.objects.get(id = id)
-        return render(request, 'Jornada/update.html', {'jornada' : jornada})
+        return redirect('/jornada')
+
+
+@login_required(redirect_field_name='')
+def viewUpdateJornada(request, id):
+    if request.user.role == 2:
+        if request.method == "POST":
+            jornada = Jornada(id = id)
+            jornada.JORNA_Nombre = request.POST.get('JORNA_Nombre')
+            jornada.save()
+            return redirect('/jornada')
+        else:
+            jornada = Jornada.objects.get(id = id)
+            return render(request, 'Jornada/update.html', {'jornada' : jornada})
+    else:
+        return redirect('/jornada')
 #endregion
 
 
 #region EMPRESA
-
+@login_required(redirect_field_name='')
 def insertEmpresa(request):
-    if request.method == "POST":
-        if request.POST.get('EMPRE_Nombre', 'EMPRE_Tipo_Identificacion'):
-            empresa = Empresa()
-            empresa.EMPRE_Nombre = request.POST.get('EMPRE_Nombre')
-            empresa.EMPRE_Identificacion = request.POST.get('EMPRE_Identificacion')
-            empresa.EMPRE_Tipo_Identificacion = request.POST.get('EMPRE_Tipo_Identificacion')
-            empresa.save()
-            return redirect('/empresa')
+    if request.user.role == 2:
+        if request.method == "POST":
+            if request.POST.get('EMPRE_Nombre', 'EMPRE_Tipo_Identificacion'):
+                empresa = Empresa()
+                empresa.EMPRE_Nombre = request.POST.get('EMPRE_Nombre')
+                empresa.EMPRE_Identificacion = request.POST.get('EMPRE_Identificacion')
+                empresa.EMPRE_Tipo_Identificacion = request.POST.get('EMPRE_Tipo_Identificacion')
+                empresa.save()
+                return redirect('/empresa') 
+        else:
+            return render(request, 'Empresa/insert.html')
     else:
-        return render(request, 'Empresa/insert.html')
-
+        return redirect('/empresa')
+        
+    
+@login_required(redirect_field_name='')
 def viewEmpresa(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
 
     empresa = Empresa.objects.all()
+    usuario = request.user
     archivo = open("ProyectoSennova/Templates/Empresa/view.html")
     leer = Template(archivo.read())
-    archivo.close
-    parametros = Context({'empresa' : empresa})
+    archivo.close  
+    parametros = Context({'empresa' : empresa, 'usuario' : usuario})
     paginalistado = leer.render(parametros)
     return HttpResponse(paginalistado)
+  
 
-
+@login_required(redirect_field_name='')
 def deleteEmpresa(request, id):
-    empresa = Empresa.objects.get(id = id)
-    empresa.delete()
-    return redirect('/empresa')
-
-
-def viewUpdateEmpresa(request, id):
-    if request.method == "POST":
-        empresa = Empresa(id = id)
-        empresa.EMPRE_Nombre = request.POST.get('EMPRE_Nombre')
-        empresa.EMPRE_Identificacion = request.POST.get('EMPRE_Identificacion')
-        empresa.EMPRE_Tipo_Identificacion = request.POST.get('EMPRE_Tipo_Identificacion')
-
-        empresa.save()
+    if request.user.role == 2:
+        empresa = Empresa.objects.get(id = id)
+        empresa.delete()
         return redirect('/empresa')
     else:
-        empresa = Empresa.objects.get(id = id)
-        return render(request, 'Empresa/update.html', {'empresa' : empresa})
+        return redirect('/empresa')
 
+  
+@login_required(redirect_field_name='')
+def viewUpdateEmpresa(request, id):
+    if request.user.role == 2:
+        if request.method == "POST":
+            empresa = Empresa(id = id)
+            empresa.EMPRE_Nombre = request.POST.get('EMPRE_Nombre')
+            empresa.EMPRE_Identificacion = request.POST.get('EMPRE_Identificacion')
+            empresa.EMPRE_Tipo_Identificacion = request.POST.get('EMPRE_Tipo_Identificacion')
+
+            empresa.save()
+            return redirect('/empresa')
+        else:
+            empresa = Empresa.objects.get(id = id)
+            return render(request, 'Empresa/update.html', {'empresa' : empresa})
+    else:
+        return redirect('/empresa')
+
+      
+@login_required(redirect_field_name='')
 def viewDetallesEmpresa(request, id):
     empresa = Empresa.objects.get(id = id)
     aprendiz = Contrato.objects.filter(empresa_id = id)
@@ -370,9 +465,12 @@ def viewDetallesEmpresa(request, id):
 
 #endregion
 
+#-------------------- Faltan las de abajo ------------------------
 
 #region CENTRO
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_centro', login_url=None)
 def insertCentro(request):
     if request.method == "POST":
         if request.POST.get('CENTR_Nombre', 'regional'):            
@@ -388,6 +486,8 @@ def insertCentro(request):
         return render(request, 'Centro/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_centro', login_url=None)
 def viewCentro(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -401,12 +501,16 @@ def viewCentro(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_centro', login_url=None)
 def deleteCentro(request, id):
     centro = Centro.objects.get(id = id)
     centro.delete()
     return redirect('/centro')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_centro', login_url=None)
 def viewUpdateCentro(request, id):
     if request.method == "POST":
         centro = Centro(id = id)
@@ -423,6 +527,8 @@ def viewUpdateCentro(request, id):
 
 #region OCUPACION
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_ocupacion', login_url=None)
 def insertOcupacion(request):
     if request.method == "POST":
         if request.POST.get('OCUPA_Nombre', 'OCUPA_Codigo_Hora'):            
@@ -439,6 +545,8 @@ def insertOcupacion(request):
         return render(request, 'Ocupacion/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_ocupacion', login_url=None)
 def viewOcupacion(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -452,12 +560,16 @@ def viewOcupacion(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_ocupacion', login_url=None)
 def deleteOcupacion(request, id):
     ocupacion = Ocupacion.objects.get(id = id)
     ocupacion.delete()
     return redirect('/ocupacion')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_ocupacion', login_url=None)
 def viewUpdateOcupacion(request, id):
     if request.method == "POST":
         ocupacion = Ocupacion(id = id)
@@ -475,6 +587,8 @@ def viewUpdateOcupacion(request, id):
 
 #region CONVENIO
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_convenio', login_url=None)
 def insertConvenio(request):
     if request.method == "POST":
         if request.POST.get('CONVE_Nombre'):            
@@ -493,6 +607,8 @@ def insertConvenio(request):
         return render(request, 'Convenio/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_convenio', login_url=None)
 def viewConvenio(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -506,12 +622,16 @@ def viewConvenio(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_convenio', login_url=None)
 def deleteConvenio(request, id):
     convenio = Convenio.objects.get(id = id)
     convenio.delete()
     return redirect('/convenio')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_convenio', login_url=None)
 def viewUpdateConvenio(request, id):
     if request.method == "POST":
         convenio = Convenio(id = id)
@@ -532,6 +652,8 @@ def viewUpdateConvenio(request, id):
 
 #region CURSO
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_curso', login_url=None)
 def insertCurso(request):
     if request.method == "POST":
         if request.POST.get('CURSO_Numero'):            
@@ -554,6 +676,8 @@ def insertCurso(request):
         return render(request, 'Curso/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_curso', login_url=None)
 def viewCurso(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -567,12 +691,16 @@ def viewCurso(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_curso', login_url=None)
 def deleteCurso(request, id):
     curso = Curso.objects.get(id = id)
     curso.delete()
     return redirect('/curso')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_curso', login_url=None)
 def viewUpdateCurso(request, id):
     if request.method == "POST":
         curso = Curso(id = id)
@@ -595,6 +723,9 @@ def viewUpdateCurso(request, id):
 
 
 #region HORAS
+    
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_horas', login_url=None)
 def insertHora(request):
     if request.method == "POST":
         if request.POST.get('HORAS_Monitores'):            
@@ -614,6 +745,8 @@ def insertHora(request):
         return render(request, 'Horas/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_horas', login_url=None)
 def viewHora(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -627,12 +760,16 @@ def viewHora(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_horas', login_url=None)
 def deleteHora(request, id):
     horas = Horas.objects.get(id = id)
     horas.delete()
     return redirect('/horas')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_horas', login_url=None)
 def viewUpdateHoras(request, id):
     if request.method == "POST":
         horas = Horas(id = id)
@@ -653,6 +790,8 @@ def viewUpdateHoras(request, id):
 
 #region PROGRAMA ESPECIAL
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_programaespecial', login_url=None)
 def insertProgEsp(request):
     if request.method == "POST":
         if request.POST.get('PROGE_Nombre'):            
@@ -669,6 +808,8 @@ def insertProgEsp(request):
         return render(request, 'ProgramaEspecial/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_programaespecial', login_url=None)
 def viewProgEsp(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -682,12 +823,16 @@ def viewProgEsp(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_programaespecial', login_url=None)
 def deleteProgEsp(request, id):
     programa = ProgramaEspecial.objects.get(id = id)
     programa.delete()
     return redirect('/programaesp')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_programaespecial', login_url=None)
 def viewUpdateProgEsp(request, id):
     if request.method == "POST":
         programa = ProgramaEspecial(id = id)
@@ -705,6 +850,8 @@ def viewUpdateProgEsp(request, id):
 
 #region PROGRAMA FORMACION
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_programaformacion', login_url=None)
 def insertProgFor(request) :
     if request.method == "POST" and request.FILES['PROGR_URL'] :
             programa = ProgramaFormacion(
@@ -729,6 +876,8 @@ def insertProgFor(request) :
         return render(request, 'ProgramaFormacion/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_programaformacion', login_url=None)
 def viewProgFor(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -742,12 +891,16 @@ def viewProgFor(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_programaformacion', login_url=None)
 def deleteProgFor(request, id):
     programa = ProgramaFormacion.objects.get(id = id)
     programa.delete()
     return redirect('/programafor')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_programaformacion', login_url=None)
 def viewUpdateProgFor(request, id):
     if request.method == "POST":
         programa = ProgramaFormacion(id = id)
@@ -767,6 +920,8 @@ def viewUpdateProgFor(request, id):
         return render(request, 'ProgramaFormacion/update.html', {'programa' : programa, 'sector' : sector})
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_programaformacion', login_url=None)
 def viewUpdateFileProgFor(request, id):
     if request.method == "POST":
         programa = ProgramaFormacion(id = id)
@@ -786,6 +941,8 @@ def viewUpdateFileProgFor(request, id):
         return render(request, 'ProgramaFormacion/updateFile.html', {'programa' : programa, 'sector' : sector})
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_programaformacion', login_url=None)
 def viewDetallesProgFor(request, id):
     programa = ProgramaFormacion.objects.get(id = id)
     ficha = Ficha.objects.filter(programaformacion = programa.id)
@@ -806,6 +963,8 @@ def viewDetallesProgFor(request, id):
 
 #region FICHA
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_ficha', login_url=None)
 def insertFicha(request):
     if request.method == "POST":
             ficha = Ficha(
@@ -830,6 +989,8 @@ def insertFicha(request):
         return render(request, 'Ficha/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_ficha', login_url=None)
 def viewFicha(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -843,12 +1004,16 @@ def viewFicha(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_ficha', login_url=None)
 def deleteFicha(request, id):
     ficha = Ficha.objects.get(id = id)
     ficha.delete()
     return redirect('/ficha')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_ficha', login_url=None)
 def viewUpdateFicha(request, id):
     if request.method == "POST":
         ficha = Ficha(id = id)
@@ -871,6 +1036,8 @@ def viewUpdateFicha(request, id):
         return render(request, 'Ficha/update.html', {'ficha' : ficha, 'centro' : centro, 'programa' : programaformacion, 'jornada' : jornada} )
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_ficha', login_url=None)
 def viewDetallesFicha(request, id):
     ficha = Ficha.objects.get(id = id)
     aprendiz = Aprendiz.objects.filter(ficha = ficha.id)
@@ -922,6 +1089,8 @@ def viewDetallesFicha(request, id):
 
 #region APRENDIZ
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_aprendiz', login_url=None)
 def insertAprendiz(request):
     if request.method == "POST" and request.FILES['APREN_Foto']:
             aprendiz = Aprendiz(
@@ -943,6 +1112,8 @@ def insertAprendiz(request):
         return render(request, 'Aprendiz/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_aprendiz', login_url=None)
 def viewAprendiz(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -956,12 +1127,16 @@ def viewAprendiz(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_aprendiz', login_url=None)
 def deleteAprendiz(request, id):
     aprendiz = Aprendiz.objects.get(id = id)
     aprendiz.delete()
     return redirect('/aprendiz')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_aprendiz', login_url=None)
 def viewUpdateAprendiz(request, id):
     if request.method == "POST":
         aprendiz = Aprendiz(id = id)
@@ -983,6 +1158,8 @@ def viewUpdateAprendiz(request, id):
 
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_aprendiz', login_url=None)
 def updateFotoAprendiz(request, id):
     if request.method == "POST" and request.FILES['APREN_Foto']:
         aprendiz = Aprendiz(id = id)
@@ -1004,6 +1181,8 @@ def updateFotoAprendiz(request, id):
 
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_aprendiz', login_url=None)
 def importarAprendiz(request):
     #Se guarda el archivo para su lectura
     if request.method == "POST" :
@@ -1095,6 +1274,8 @@ def importarAprendiz(request):
         return render(request, 'aprendiz/import.html')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_aprendiz', login_url=None)
 def viewDetallesAprendiz(request, id):
     aprendiz = Aprendiz.objects.get(id = id)
     contrato = Contrato.objects.filter(aprendiz = aprendiz.id)
@@ -1114,6 +1295,9 @@ def viewDetallesAprendiz(request, id):
 
 
 #region CONTRATO
+
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_contrato', login_url=None)
 def insertContrato(request):
     if request.method == "POST":
         contrato = Contrato(
@@ -1134,6 +1318,8 @@ def insertContrato(request):
         return render(request, 'Contrato/insert.html', parametros)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_contrato', login_url=None)
 def viewContrato(request):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
@@ -1147,12 +1333,16 @@ def viewContrato(request):
     return HttpResponse(paginalistado)
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.delete_contrato', login_url=None)
 def deleteContrato(request, id):
     contrato = Contrato.objects.get(id = id)
     contrato.delete()
     return redirect('/contrato')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.change_contrato', login_url=None)
 def viewUpdateContrato(request, id):
     if request.method == "POST":
         contrato = Contrato(id = id)
@@ -1173,6 +1363,8 @@ def viewUpdateContrato(request, id):
 
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.add_contrato', login_url=None)
 def importarContrato(request):
     if request.method == "POST" :
         #Se guarda el documento para su lectura
@@ -1314,6 +1506,8 @@ def importarContrato(request):
         return render(request, 'contrato/import.html')
 
 
+@login_required(redirect_field_name='')
+@permission_required('ProyectoSennova.view_contrato', login_url=None)
 def viewDetallesContrato(request, id):
     contrato = Contrato.objects.get(id = id)
     aprendiz = Aprendiz.objects.get(APREN_Documento = contrato.aprendiz.APREN_Documento)
@@ -1331,6 +1525,14 @@ def viewDetallesContrato(request, id):
 
 
 #region USUARIO
+
+#Ejemplo de Vista basada en Clase
+class Index(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'Usuario/index.html')
+
+    
+
 def insertUsuario(request):
     if request.method == "POST":
         user = User.objects.create_user(
@@ -1340,8 +1542,6 @@ def insertUsuario(request):
         )
         user.last_name = request.POST['last_name'],
         user.first_name = request.POST['first_name'],
-        user.save()
-        
         return redirect('/index')
     else:
         return render(request, "Usuario/insert.html")
@@ -1365,16 +1565,23 @@ def loginUsuario(request):
 
 def logoutUsuario(request):
     logout(request)
-    return redirect('/usuario/login')
+    return redirect('/accounts/login')
 
 
 def viewIndex(request):
     archivo = open("ProyectoSennova/Templates/Usuario/index.html")
     leer = Template(archivo.read())
     archivo.close
-    parametros = Context({})
+    usuario = request.user
+    parametros = Context({'usuario' : usuario})
     paginalistado = leer.render(parametros) 
     return HttpResponse(paginalistado)
+
+      
+def usuarioSession(request):
+    usuario = request.user
+    return usuario
+    
 
 #endregion
 

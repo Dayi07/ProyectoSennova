@@ -19,18 +19,19 @@
             </div>
         </div>
         <div class="content-body">
-            <section id="basic-datatable">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-
-                            {{user}}
-
-                            <p>Bienvedino al Sistema de gestion.... {{username}}</p>
-
-                        </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mb-1">
+                           {{usuario.get_full_name}}    <br><br>  
+                           
+                            {% if usuario.role == 1 %}
+                                Instructor
+                            {% else %}
+                                Admin
+                            {% endif %} <br><br>                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
 {% include 'Inc/footer.html' %}
