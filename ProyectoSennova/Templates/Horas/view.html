@@ -4,8 +4,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="/horas">Listado</a>
                                 </li>
+                                {% if usuario.role == 2 %}
                                 <li class="breadcrumb-item"><a href="/horas/insert/">Insertar</a>
                                 </li>
+                                {% endif %}
                             </ol>
                         </div>
                     </div>
@@ -35,7 +37,9 @@
                                         <th>Horas planta</th>
                                         <th>Total horas</th>
                                         <th>Ocupacion</th>
+                                        {% if usuario.role == 2 %}
                                         <th>Acciones</th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,6 +52,7 @@
                                         <td>{{ item.HORAS_Planta }}</td>
                                         <td>{{ item.HORAS_Total }}</td>
                                         <td>{{ item.ocupacion.OCUPA_Nombre }}</td>
+                                        {% if usuario.role == 2 %}
                                         <td>
                                             <a onclick="borrar('{{item.id}}')">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
@@ -60,6 +65,7 @@
                                                 </svg>
                                             </a>
                                         </td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>

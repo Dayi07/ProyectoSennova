@@ -5,8 +5,10 @@
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/jornada">Listado</a>
                                     </li>
+                                    {% if usuario.role == 2 %}
                                     <li class="breadcrumb-item"><a href="/jornada/insert/">Insertar</a>
-                                    </li>                   
+                                    </li>    
+                                    {% endif %}               
                                 </ol>
                             </div>
                     </div>
@@ -31,13 +33,16 @@
                                     <tr>
                                         <th></th>
                                         <th>Nombre</th>
+                                        {% if usuario.role == 2 %}
                                         <th>Acciones</th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 {% for item in jornada %}
                                 <tr>
                                     <td></td>
                                     <td>{{ item.JORNA_Nombre }}</td>
+                                    {% if usuario.role == 2 %}
                                     <td>
                                         <a onclick="borrar('{{item.id}}')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
@@ -51,6 +56,8 @@
                                           </svg>
                                         </a>
                                     </td>
+                                    {% endif %}
+
                                 </tr>
                                 {% endfor %}
                             </table>

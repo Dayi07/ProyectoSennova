@@ -60,10 +60,18 @@
             <li class="nav-item dropdown dropdown-notification me-25"><a class="nav-link" href="#" data-bs-toggle="dropdown"><i class="ficon" data-feather="bell"></i></a>                    
             </li>
             <li class="nav-item dropdown dropdown-user"><a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder">{{usuario.first_name}} {{usuario.last_name}}</span><span class="user-status">Coordinador</span></div><span class="avatar"><img class="round" src="/media/{{usuario.foto}}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
+                    <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder">{{usuario.get_full_name}}</span>
+                        <span class="user-status">
+                            {% if usuario.role == 1 %}
+                                Instructor
+                            {% elif usuario.role == 2 %}
+                                Administrador
+                            {% endif %}
+                        </span>
+                    </div><span class="avatar"><img class="round" src="/media/{{usuario.foto}}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user">
-                    <a class="dropdown-item" href="#"><i class="me-50" data-feather="user"></i> Profile</a>
+                    <a class="dropdown-item" href="/perfil"><i class="me-50" data-feather="user"></i> Profile</a>
                     <a class="dropdown-item" href="#"><i class="me-50" data-feather="mail"></i> Inbox</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#"><i class="me-50" data-feather="settings"></i> Settings</a>
@@ -99,8 +107,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Pais</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/pais/insert"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Pais</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/pais"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Pais</span></a>
                                 </li>
                             </ul>
@@ -108,8 +118,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Regional</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/regional/insert"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Regional</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/regional"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Regional</span></a>
                                 </li>
                             </ul>
@@ -117,8 +129,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Departamento</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/departamento/insert"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Departamento</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/departamento"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Departamento</span></a>
                                 </li>
                             </ul>
@@ -127,8 +141,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Municipio</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/municipio/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Municipio</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/municipio"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Municipio</span></a>
                                 </li>
                             </ul>
@@ -136,8 +152,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Centro</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/centro/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Centro</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/centro"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Centro</span></a>
                                 </li>
                             </ul>
@@ -145,8 +163,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Sector</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/sector/insert"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Sector</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/sector"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Sector</span></a>
                                 </li>
                             </ul>
@@ -162,8 +182,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Ficha</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/ficha/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Ficha</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/ficha"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Ficha</span></a>
                                 </li>
                             </ul>
@@ -171,8 +193,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Curso</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/curso/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Curso</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/curso"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Curso</span></a>
                                 </li>
                             </ul>
@@ -180,8 +204,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Programa Especial</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/programaesp/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Programa</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/programaesp"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Programa</span></a>
                                 </li>
                             </ul>
@@ -189,8 +215,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Programa Formacion</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/programafor/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Programa</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/programafor"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Programa</span></a>
                                 </li>
                             </ul>
@@ -198,8 +226,10 @@
         
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Jornada</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/jornada/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Jornada</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/jornada"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Jornada</span></a>
                                 </li>
                             </ul>
@@ -214,8 +244,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Aprendiz</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/aprendiz/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Aprendiz</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/aprendiz"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Aprendiz</span></a>
                                 </li>
                             </ul>
@@ -223,8 +255,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Contratos</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/contrato/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Contrato</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/contrato"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Contrato</span></a>
                                 </li>
                             </ul>
@@ -238,8 +272,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Convenio</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/convenio/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Convenio</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/convenio"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Convenio</span></a>
                                 </li>
                             </ul>
@@ -247,8 +283,10 @@
                         
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Horas</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/horas/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Horas</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/horas"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Horas</span></a>
                                 </li>
                             </ul>
@@ -256,8 +294,10 @@
         
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Ocupacion</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/ocupacion/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Ocupacion</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/ocupacion"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Ocupacion</span></a>
                                 </li>
                             </ul>
@@ -265,8 +305,10 @@
 
                         <li class=" nav-item"><a class="d-flex align-items-center" href="#"><i data-feather="file-text"></i><span class="menu-title text-truncate" data-i18n="Pages">Empresa</span></a>
                             <ul class="menu-content">
+                                {% if usuario.role == 2 %}
                                 <li><a class="d-flex align-items-center" href="/empresa/insert/"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="Profile">Registrar Empresa</span></a>
                                 </li>
+                                {% endif %}
                                 <li><a class="d-flex align-items-center" href="/empresa"><i data-feather="circle"></i><span class="menu-item text-truncate" data-i18n="FAQ">Listado de Empresa</span></a>
                                 </li>
                             </ul>

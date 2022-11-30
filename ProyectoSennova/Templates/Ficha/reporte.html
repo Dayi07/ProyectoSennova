@@ -7,6 +7,9 @@
     <title>Reporte</title>
 
     <style>
+        body{
+            font-family: sans-serif;
+        }
         h2, h1 {
             text-align: center;
         }
@@ -18,41 +21,67 @@
         }
     
         table{
-            border-color: black;
+            background-color: white;
+            border: solid 1px;
+            border-color: rgb(0, 0, 0);
         }
-    
+
+        .tr-thead{
+            background-color: #6bd536;
+            color: white;
+        }
+
+        tr:nth-child(even){
+            background-color: rgb(204, 204, 204);
+        }
+
+        .info-ficha{
+            border: none;
+        }
+
+        .info-ficha td{
+            text-align: left;
+        }
+
     </style>
     
 </head>
 
 <body>
-        <h1>Reporte de Aprendices {{ ficha.FICHA_Identificador_Unico }} - {{ ficha.programaformacion.PROGR_Nombre }}</h1>
+        <h1>Reporte de Aprendices</h1>
 
-        <p>
-            <h3>Informacion de la ficha</h3>
-            <b>Encargado:</b> {{ ficha.FICHA_Nombre_Responsable }} <br>
-            <b>Etapa:</b> {{ ficha.FICHA_Etapa }} <br>
-            <b>Jornada:</b> {{ ficha.jornada.JORNA_Nombre}} <br>
-            <b>Centro:</b> {{ ficha.centro.CENTR_Nombre}} <br>
-            <b>Fecha de inicio:</b> {{ ficha.FICHA_Fecha_Inicio}} <br>
-            <b>Fecha de finalizacion:</b> {{ ficha.FICHA_Fecha_Terminacion}} <br>
+        <table class="info-ficha">
+            <b>FICHA DE CARACTERIZACION:</b> {{ ficha.FICHA_Identificador_Unico }} - {{ ficha.programaformacion.PROGR_Nombre }} <br>
+            <td>
+                <b>FECHA DEL REPORTE:</b> {{ fecha}} <br>
+                <b>CENTRO:</b> {{ ficha.centro.CENTR_Nombre}} <br>
+                <b>JORNADA:</b> {{ ficha.jornada.JORNA_Nombre}} <br>
+            </td>
 
-        </p>
+            <td>
+                <b>ETAPA:</b> {{ ficha.FICHA_Etapa }} <br>
+                <b>FECHA DE INICIO:</b> {{ ficha.FICHA_Fecha_Inicio}} <br>
+                <b>FECHA DE FINALIZACION:</b> {{ ficha.FICHA_Fecha_Terminacion}} <br>
+            </td>
+            <td>                
+            </td>
+
+        </table> <br><br>
 
         <h2>Aprendices asociados a la Ficha</h2>
-        <table border="1">
+        <table>
             <thead> 
-                <tr>                                        
-                    <th><br> Aprendiz</th>
-                    <th>Documento</th>
-                    <th>Correo</th>
-                    <th>Estado del Aprendiz</th>
+                <tr class="tr-thead">                                        
+                    <th>APRENDIZ</th>
+                    <th>DOCUMENTO</th>
+                    <th>CORREO</th>
+                    <th>ESTADO DEL APRENDIZ</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in aprendiz %}
                 <tr>
-                    <td><br> {{ item.APREN_Nombre }} {{ item.APREN_Apellido }} </td>
+                    <td> {{ item.APREN_Nombre }} {{ item.APREN_Apellido }} </td>
                     <td> {{ item.APREN_Tipo_Documento }} {{ item.APREN_Documento }} </td>
                     <td> {{ item.APREN_Correo }} </td>
                     <td> {{ item.APREN_Estado }} </td>
@@ -69,13 +98,13 @@
         <h2>Aprendices con Contrato</h2>
         <table border="1">
             <thead> 
-                <tr>                                        
-                    <th><br> Aprendiz</th>
-                    <th>Estado del aprendiz</th>
-                    <th>Estado del contrato</th>
-                    <th>Empresa patrocinadora</th>
-                    <th>Fecha inicio</th>
-                    <th>Fecha terminacion</th>
+                <tr class="tr-thead">                                        
+                    <th><br> APRENDIZ</th>
+                    <th>ESTADO DEL APRENDIZ</th>
+                    <th>ESTADO DEL CONTRATO</th>
+                    <th>EMPRESA</th>
+                    <th>FECHA INICIO</th>
+                    <th>FECHA TERMINACION</th>
                 </tr>
             </thead>
             <tbody>
@@ -91,9 +120,6 @@
                 {% endfor %}
             </tbody>
         </table>    
-        {% else %}
-        <br><br>
-        <h2>No hay Aprendices con Contrato</h2>
         {% endif %}
 
 
@@ -104,10 +130,10 @@
         <h2>Aprendices sin Contrato</h2>
         <table border="1">
             <thead> 
-                <tr>                                        
-                    <th><br> Aprendiz</th>
-                    <th>Estado del aprendiz</th>
-                    <th>Estado del Contrato</th>
+                <tr class="tr-thead">                                        
+                    <th><br> APRENDIZ</th>
+                    <th>ESTADO DEL APRENDIZ</th>
+                    <th>ESTADO DEL Contrato</th>
                 </tr>
             </thead>
             <tbody>
@@ -120,9 +146,6 @@
                 {% endfor %}
             </tbody>
         </table>   
-        {% else %}
-        <br><br>
-        <h2>No hay Aprendices disponibles</h2>
         {% endif %}
 
 
@@ -133,14 +156,14 @@
         <h2>Aprendices con Contrato Terminado</h2>
         <table border="1">
             <thead> 
-                <tr>                                        
-                    <th><br> Aprendiz</th>
-                    <th>Estado del aprendiz</th>
-                    <th>Estado del contrato</th>
-                    <th>Empresa patrocinadora</th>
+                <tr class="tr-thead">                                        
+                    <th>APRENDIZ</th>
+                    <th>ESTADO DEL APRENDIZ</th>
+                    <th>ESTADO DEL contrato</th>
+                    <th>EMPRESA</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody>  
                 {% for item in terminado %}
                 <tr>
                     <td><br> {{ item.aprendiz.APREN_Nombre }} </td>
@@ -151,9 +174,6 @@
                 {% endfor %}
             </tbody>
         </table> 
-        {% else %}
-        <br><br>
-        <h2>No hay Aprendices con Contrato Terminado</h2>
         {% endif %}
 
 

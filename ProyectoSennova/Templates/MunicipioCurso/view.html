@@ -5,8 +5,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="/municipio/">Listado</a>
                                 </li>
+                                {% if usuario.role == 2 %}
                                 <li class="breadcrumb-item"><a href="/municipio/insert/">Insertar</a>
                                 </li>
+                                {% endif %}
                             </ol>
                         </div>
                     </div>
@@ -33,7 +35,9 @@
                                         <th></th>
                                         <th>Nombre del Municipio</th>
                                         <th>Nombre del Departamento</th>
+                                        {% if usuario.role == 2 %}
                                         <th>Acciones</th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 {% for item in municipio %}
@@ -41,6 +45,8 @@
                                     <td></td>
                                     <td>{{ item.MUNIC_Nombre }}</td>
                                     <td>{{ item.departamentocurso.DEPAR_Nombre }}</td>
+                                    
+                                    {% if usuario.role == 2 %}
                                     <td>
                                         <a onclick="borrar('{{item.id}}')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
@@ -54,6 +60,8 @@
                                             </svg>
                                         </a>
                                     </td>
+                                    {% endif%}
+
                                 </tr>
                                 {% endfor %}
                             </table>

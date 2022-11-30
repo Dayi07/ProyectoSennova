@@ -36,7 +36,7 @@ from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, vie
 from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetallesFicha, reporteFicha                                                         #FICHA
 from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz, viewDetallesAprendiz    #APRENDIZ
 from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato, viewDetallesContrato                        #Contrato
-from ProyectoSennova.views import insertUsuario, loginUsuario, logoutUsuario, viewIndex
+from ProyectoSennova.views import insertUsuario, loginUsuario, logoutUsuario, viewIndex, viewPerfil, updateFotoUsuario
 
 
 
@@ -142,7 +142,8 @@ urlpatterns = [
     path('accounts/login/', loginUsuario, name='loginUsuario'),
     path('accounts/logout/', logoutUsuario, name='logoutUsuario'),
     path('index/', viewIndex, name='viewIndex'),
-
+    path('perfil/', viewPerfil, name='viewPerfil'),
+    path('update/foto/<int:id>', updateFotoUsuario, name='updateFotoUsuario'),
 
     path('ficha/reporte/<int:id>', reporteFicha, name='reporteFicha'),  
 

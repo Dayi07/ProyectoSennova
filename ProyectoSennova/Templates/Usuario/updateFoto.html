@@ -1,9 +1,8 @@
 {% include 'Inc/header.html' %}
-                      <h2 class="content-header-title float-start mb-0">Bienvenido</h2>
+                        <h2 class="content-header-title float-start mb-0">Usuario</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="/index">Inicio</a>
-                                </li>     
+                                                               
                             </ol>
                         </div>
                     </div>
@@ -18,17 +17,30 @@
                 </div>
             </div>
         </div>
-        <div class="content-body">
+    </div>
+<section id="basic-input" class="tootip-validations">     
+    <div class="content-body">
+        <form class="needs-validation" method="POST" action=" " enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
             <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="mb-1">
-
-                        </div>
-                </div>
-            </div>
-        </div>
-        </div>
-        
+                 <div class="card-header">
+                     <h4 class="card-title">Actualizar Foto</h4>
+                 </div>
+                 <div class="card-body">
+                     <div class="row">
+                         <div class="col-xl-4 col-md-6 col-12">
+                            <div class="mb-1">
+                                <label for="foto" class="form-label">Foto del usuario:</label>
+                                <input class="form-control" type="file" name="foto" id="foto" accept=".jpg" required/>
+                                <div class="invalid-tooltip">La foto es obligatoria.</div>                               
+                            </div>
+                         </div> 
+                     </div>
+                     <button class="btn btn-primary" type="submit">Guardar</button>
+                 </div>
+             </div>
+        </form>
+    </div>
+</section>
 
 {% include 'Inc/footer.html' %}
