@@ -33,6 +33,16 @@
                      <div class="row">
                         <div class="col-lg-6 col-md-12 mb-1 mb-sm-0">
                             <div class="mb-1">
+
+                                {% if mensaje is not None %}                      
+                                <script>
+                                    Swal.fire({
+                                        icon: 'error',
+                                        text: '{{mensaje}}',
+                                    })
+                                </script>
+                                {% endif %}
+
                                 <label for="importar" class="form-label">Importar datos:</label>
                                 <input class="form-control" type="file" name="importar" id="importar" accept=".xlsx, .xls" required/>
                                 <div class="invalid-tooltip">El Excel es obligatorio.</div> 

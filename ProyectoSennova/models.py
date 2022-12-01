@@ -11,19 +11,19 @@ class User(AbstractUser):
       (INSTRUCTOR, 'Instructor'),
       (ADMINISTRADOR, 'Administrador'),
     )    
-    foto = models.ImageField(upload_to='User/', blank=True, null=True)
+    foto = models.ImageField(upload_to='User/', blank=True, null=True, default='User/user.jpg')
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
 
 
 class PaisCurso(models.Model):
-    PAISC_Nombre = models.CharField(max_length=50) 
+    PAISC_Nombre = models.CharField(max_length=100) 
     class Meta:
         db_table = 'Pais_Curso'
 
 
  
 class DepartamentoCurso(models.Model):
-    DEPAR_Nombre = models.CharField(max_length=50)
+    DEPAR_Nombre = models.CharField(max_length=100)
     paiscurso = models.ForeignKey(
         PaisCurso, 
         on_delete=models.CASCADE, 
@@ -34,7 +34,7 @@ class DepartamentoCurso(models.Model):
 
 
 class MunicipioCurso(models.Model):
-    MUNIC_Nombre = models.CharField(max_length=50)
+    MUNIC_Nombre = models.CharField(max_length=100)
     departamentocurso = models.ForeignKey(
         DepartamentoCurso,
         on_delete = models.CASCADE,
@@ -45,38 +45,38 @@ class MunicipioCurso(models.Model):
 
 
 class Regional(models.Model):
-    REGIO_Nombre = models.CharField(max_length=50)
+    REGIO_Nombre = models.CharField(max_length=100)
     class Meta:
         db_table = 'Regional'
     
 
 
 class Sector(models.Model):
-    SECTO_Nombre = models.CharField(max_length=50)
-    SECTO_NombreNuevo = models.CharField(max_length=50)
+    SECTO_Nombre = models.CharField(max_length=100)
+    SECTO_NombreNuevo = models.CharField(max_length=100)
     class Meta:
         db_table = 'Sector'
 
 
 
 class Jornada(models.Model):
-    JORNA_Nombre = models.CharField(max_length=50)
+    JORNA_Nombre = models.CharField(max_length=100)
     class Meta:
         db_table = 'Jornada'
 
 
 
 class Empresa(models.Model):
-    EMPRE_Tipo_Identificacion = models.CharField(max_length=50)
-    EMPRE_Nombre = models.CharField(max_length=50)
-    EMPRE_Identificacion = models.CharField(max_length=50)
+    EMPRE_Tipo_Identificacion = models.CharField(max_length=100)
+    EMPRE_Nombre = models.CharField(max_length=100)
+    EMPRE_Identificacion = models.CharField(max_length=100)
     class Meta:
         db_table = 'Empresa'
 
 
 
 class Centro(models.Model):
-    CENTR_Nombre = models.CharField(max_length=50)
+    CENTR_Nombre = models.CharField(max_length=100)
     regional = models.ForeignKey(
         Regional,
         on_delete = models.CASCADE
@@ -87,12 +87,12 @@ class Centro(models.Model):
 
 
 class ProgramaFormacion(models.Model):
-    PROGR_Nombre = models.CharField(max_length=50) 
-    PROGR_Modalidad = models.CharField(max_length=50)
-    PROGR_Tipo_Formacion = models.CharField(max_length=50)
-    PROGR_Duracion = models.CharField(max_length=50)
-    PROGR_Version = models.CharField(max_length=50)
-    PROGR_Nivel = models.CharField(max_length=50)
+    PROGR_Nombre = models.CharField(max_length=100) 
+    PROGR_Modalidad = models.CharField(max_length=100)
+    PROGR_Tipo_Formacion = models.CharField(max_length=100)
+    PROGR_Duracion = models.CharField(max_length=100)
+    PROGR_Version = models.CharField(max_length=100)
+    PROGR_Nivel = models.CharField(max_length=100)
     PROGR_URL = models.FileField(upload_to='ProgramaFor/', blank=True, null=True)
     sector = models.ForeignKey(
         Sector,
@@ -104,11 +104,11 @@ class ProgramaFormacion(models.Model):
 
 
 class Ficha(models.Model):
-    FICHA_Identificador_Unico = models.CharField(max_length=50)
+    FICHA_Identificador_Unico = models.CharField(max_length=100)
     FICHA_Fecha_Inicio = models.DateField() 
     FICHA_Fecha_Terminacion = models.DateField() 
-    FICHA_Etapa = models.CharField(max_length=50)
-    FICHA_Nombre_Responsable = models.CharField(max_length=50)
+    FICHA_Etapa = models.CharField(max_length=100)
+    FICHA_Nombre_Responsable = models.CharField(max_length=100)
     FICHA_Actualizacion_Carga = models.DateField() 
     centro = models.ForeignKey(
         Centro,
@@ -128,8 +128,8 @@ class Ficha(models.Model):
 
 
 class Ocupacion(models.Model):
-    OCUPA_Nombre = models.CharField(max_length=50)
-    OCUPA_Codigo_Hora = models.CharField(max_length=50)
+    OCUPA_Nombre = models.CharField(max_length=100)
+    OCUPA_Codigo_Hora = models.CharField(max_length=100)
     sector = models.ForeignKey(
         Sector,
         on_delete = models.CASCADE 
@@ -140,8 +140,8 @@ class Ocupacion(models.Model):
 
 
 class Convenio(models.Model):
-    CONVE_Nombre = models.CharField(max_length=50)
-    CONVE_Ampliacion_Cobertura = models.CharField(max_length=50)
+    CONVE_Nombre = models.CharField(max_length=100)
+    CONVE_Ampliacion_Cobertura = models.CharField(max_length=100)
     empresa = models.ForeignKey(
         Empresa,
         on_delete = models.CASCADE
@@ -156,8 +156,8 @@ class Convenio(models.Model):
 
 
 class ProgramaEspecial(models.Model):
-    PROGE_Nombre = models.CharField(max_length=50)
-    PROGE_Modalidad = models.CharField(max_length=50)
+    PROGE_Nombre = models.CharField(max_length=100)
+    PROGE_Modalidad = models.CharField(max_length=100)
     sector = models.ForeignKey(
         Sector, 
         on_delete = models.CASCADE
@@ -168,11 +168,11 @@ class ProgramaEspecial(models.Model):
 
 
 class Horas(models.Model):
-    HORAS_Monitores = models.CharField(max_length=50)
-    HORAS_Inst_Empresa = models.CharField(max_length=50)
-    HORAS_Contratista_Externos = models.CharField(max_length=50)
-    HORAS_Planta = models.CharField(max_length=50)
-    HORAS_Total = models.CharField(max_length=50)
+    HORAS_Monitores = models.CharField(max_length=100)
+    HORAS_Inst_Empresa = models.CharField(max_length=100)
+    HORAS_Contratista_Externos = models.CharField(max_length=100)
+    HORAS_Planta = models.CharField(max_length=100)
+    HORAS_Total = models.CharField(max_length=100)
     ocupacion = models.ForeignKey(
         Ocupacion,
         on_delete = models.CASCADE
@@ -182,10 +182,10 @@ class Horas(models.Model):
 
  
 class Curso(models.Model):
-    CURSO_Numero = models.CharField(max_length=50)
-    CURSO_Nombre = models.CharField(max_length=50)
-    CURSO_Estado = models.CharField(max_length=50)
-    CURSO_Tipo = models.CharField(max_length=50)
+    CURSO_Numero = models.CharField(max_length=100)
+    CURSO_Nombre = models.CharField(max_length=100)
+    CURSO_Estado = models.CharField(max_length=100)
+    CURSO_Tipo = models.CharField(max_length=100)
     sector = models.ForeignKey(
         Sector,
         on_delete = models.CASCADE
@@ -204,13 +204,13 @@ class Curso(models.Model):
 
 
 class Aprendiz(models.Model):
-    APREN_Nombre = models.CharField(max_length=50)
-    APREN_Apellido = models.CharField(max_length=50)
-    APREN_Documento = models.CharField(max_length=50)
-    APREN_Tipo_Documento = models.CharField(max_length=50)
-    APREN_Celular = models.CharField(max_length=50)
-    APREN_Estado = models.CharField(max_length=50)
-    APREN_Correo = models.CharField(max_length=50)
+    APREN_Nombre = models.CharField(max_length=100)
+    APREN_Apellido = models.CharField(max_length=100)
+    APREN_Documento = models.CharField(max_length=100)
+    APREN_Tipo_Documento = models.CharField(max_length=100)
+    APREN_Celular = models.CharField(max_length=100)
+    APREN_Estado = models.CharField(max_length=100)
+    APREN_Correo = models.CharField(max_length=100)
     APREN_Foto = models.ImageField(upload_to='Aprendiz/', blank=True, null=True)
     ficha = models.ForeignKey(
         Ficha, 
@@ -232,8 +232,8 @@ class Contrato(models.Model):
     CONT_Fecha_Creacion = models.DateField()
     CONT_Fecha_Inicio = models.DateField()
     CONT_Fecha_Terminacion = models.DateField()
-    CONT_Estado_Aprendiz = models.CharField(max_length=50)
-    CONT_Estado_Contrato = models.CharField(max_length=50)
+    CONT_Estado_Aprendiz = models.CharField(max_length=100)
+    CONT_Estado_Contrato = models.CharField(max_length=100)
     aprendiz = models.ForeignKey(
         Aprendiz,
         on_delete = models.CASCADE

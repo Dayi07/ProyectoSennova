@@ -27,14 +27,15 @@
                             <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
                                 
                                 {% if mensaje is not None %}
-                                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                        <center>
-                                            <p class="card-text mb-2">Los datos estan incorrectos</p> 
-                                        </center>
-                                    </div>
+                                <script>
+                                    Swal.fire({
+                                    icon: 'error',
+                                    text: '{{mensaje}}',
+                                    })
+                                </script>
                                 {% endif %}
                                                        
-                                <h2 class="card-title fw-bold mb-1">Welcome! 👋 {{user}}</h2>
+                                <h2 class="card-title fw-bold mb-1">Welcome! 👋</h2>
                                 <p class="card-text mb-2">Ingresa tus datos para tener acceso al sistema</p>
  
                                 <form class="needs-validation" method="POST" novalidate>

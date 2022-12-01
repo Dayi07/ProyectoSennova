@@ -1296,79 +1296,92 @@ def importarAprendiz(request):
             #Se crea el engine(motor) con las especificaiones de la Base de Datos
             engine = create_engine('mysql://root@localhost/ProyectoEtapa')
 
-            #Se hacen dos lecturas del documento excel
-            #Uno con el documento completo para la captura de la Ficha
-            datos = pd.read_excel(io = url, sheet_name=0, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None).fillna(value='Por definir')
-            #Otra con solo los datos de la tabla 
-            datos2 = pd.read_excel(io = url, sheet_name=0, header=4, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None).fillna(value='Por definir')
-            
-            #Se hace la busqueda de la Ficha y se usa split para separar las demas palabras
-            busq = datos.loc[0,'APREN_Nombre']
-            busq.split()
-            ficha = re.split(r'\s+', busq)
-
-
-            #Se busca en la clase la Ficha capturada si ya esta registrada se captura, si no esta registrada se guarda
-            if Ficha.objects.filter(FICHA_Identificador_Unico = ficha[0]):
-                ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = ficha[0])
-                print('FICHA YA REGISTRADA', ficha_def.FICHA_Identificador_Unico)
+            #Se hace una lectura de prueba para verificar el numero de columnas y con eso verificar que el documento sea el correcto
+            prueba = pd.read_excel(io = url, sheet_name=0, header=4)
+            columnas =  len(prueba.columns)   
+            if columnas == 7:
+                pass
             else:
-                new_ficha = Ficha(
-                    FICHA_Identificador_Unico = ficha[0],
-                    FICHA_Fecha_Inicio = date.today(),
-                    FICHA_Fecha_Terminacion = date.today(),
-                    FICHA_Actualizacion_Carga = date.today(),
-                    FICHA_Etapa = 'Por definir',
-                    FICHA_Nombre_Responsable = 'Por definir',
-                    jornada = Jornada(id = 1),
-                    programaformacion = ProgramaFormacion(id = 1),
-                    centro = Centro(id = 1)
-                )
-                new_ficha.save()
-                ficha_def = new_ficha
-                print('FICHA RECIENTE GUARDADA', ficha_def.FICHA_Identificador_Unico, ficha_def.FICHA_Fecha_Inicio)
+                mensaje = 'El documento no es el correcto. Por favor verifique y vuelva a intentarlo.'
+                return render(request, 'aprendiz/import.html', {'mensaje' : mensaje})
 
-            #Se guarda la fecha de Actualizacion en la ficha
-            ficha_def.FICHA_Actualizacion_Carga = date.today()
-            ficha_def.save()
 
-            #Se inserta una nueva columna con el Id de la Ficha
-            datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
+            try:
+                #Se hacen dos lecturas del documento excel
+                #Uno con el documento completo para la captura de la Ficha
+                datos = pd.read_excel(io = url, sheet_name=0, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None).fillna(value='Por definir')
 
-            #Se crea una lista para almacenar los indices con datos duplicados (Que ya estan en la Base de Datos)            
-            lista = []
-            for i in range(0, len(datos2)):
-                #Se recorre la columna del Documento
-                num = datos2.iloc[i]['APREN_Documento']
+                #Otra con solo los datos de la tabla 
+                datos2 = pd.read_excel(io = url, sheet_name=0, header=4, names=['APREN_Tipo_Documento', 'APREN_Documento', 'APREN_Nombre', 'APREN_Apellido', 'APREN_Celular', 'APREN_Correo', 'APREN_Estado'], index_col=None).fillna(value='Por definir')
 
-                #Buscamos el estado del Aprendiz en el documento
-                est = datos2.loc[i, 'APREN_Estado']
-                cor = datos2.loc[i, 'APREN_Correo']
-                cel = datos2.loc[i, 'APREN_Celular']
-                #Se busca si esta en la Base de Datos
-                if Aprendiz.objects.filter(APREN_Documento = num):
-                    aprendiz = Aprendiz.objects.get(APREN_Documento = num)
-                    lista.append(i)
-                    
-                    #Comparamos el estado del aprendiz, lo guardamos en caso de que sea diferente y se agrega el indice a la lista 
-                    if aprendiz.APREN_Estado != est:
-                        aprendiz.APREN_Estado = est
-                        aprendiz.save()
-                    
-                    if aprendiz.APREN_Correo != cor:
-                        aprendiz.APREN_Correo = cor
-                        aprendiz.save()
-                    if aprendiz.APREN_Celular != cel:
-                        aprendiz.APREN_Celular = cel
-                        aprendiz.save()        
+                #Se hace la busqueda de la Ficha y se usa split para separar las demas palabras
+                busq = datos.loc[0,'APREN_Nombre']
+                busq.split()
+                ficha = re.split(r'\s+', busq)
 
-            #Se borran las filas por medio de sus indices y se guarda en un nuevo DataFrame
-            datos_completos = datos2.drop(lista, axis=0)
-            
-            #Se borra la carpeta donde se encuentra el Excel debido a que ya hizo la lectura
-            rmtree("ProyectoSennova/media/Importar")  
-            #Se guardan los datos del DataFrame en la Base de Datos          
-            datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
+
+                #Se busca en la clase la Ficha capturada si ya esta registrada se captura, si no esta registrada se guarda
+                if Ficha.objects.filter(FICHA_Identificador_Unico = ficha[0]):
+                    ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = ficha[0])
+                else:
+                    new_ficha = Ficha(
+                        FICHA_Identificador_Unico = ficha[0],
+                        FICHA_Fecha_Inicio = date.today(),
+                        FICHA_Fecha_Terminacion = date.today(),
+                        FICHA_Actualizacion_Carga = date.today(),
+                        FICHA_Etapa = 'Por definir',
+                        FICHA_Nombre_Responsable = 'Por definir',
+                        jornada = Jornada(id = 1),
+                        programaformacion = ProgramaFormacion(id = 1),
+                        centro = Centro(id = 1)
+                    )
+                    new_ficha.save()
+                    ficha_def = new_ficha
+
+                #Se guarda la fecha de Actualizacion en la ficha
+                ficha_def.FICHA_Actualizacion_Carga = date.today()
+                ficha_def.save()
+
+                #Se inserta una nueva columna con el Id de la Ficha
+                datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
+
+                #Se crea una lista para almacenar los indices con datos duplicados (Que ya estan en la Base de Datos)            
+                lista = []
+                for i in range(0, len(datos2)):
+                    #Se recorre la columna del Documento
+                    num = datos2.iloc[i]['APREN_Documento']
+
+                    #Buscamos el estado del Aprendiz en el documento
+                    est = datos2.loc[i, 'APREN_Estado']
+                    cor = datos2.loc[i, 'APREN_Correo']
+                    cel = datos2.loc[i, 'APREN_Celular']
+                    #Se busca si esta en la Base de Datos
+                    if Aprendiz.objects.filter(APREN_Documento = num):
+                        aprendiz = Aprendiz.objects.get(APREN_Documento = num)
+                        lista.append(i)
+                        
+                        #Comparamos el estado del aprendiz, lo guardamos en caso de que sea diferente y se agrega el indice a la lista 
+                        if aprendiz.APREN_Estado != est:
+                            aprendiz.APREN_Estado = est
+                            aprendiz.save()
+                        
+                        if aprendiz.APREN_Correo != cor:
+                            aprendiz.APREN_Correo = cor
+                            aprendiz.save()
+                        if aprendiz.APREN_Celular != cel:
+                            aprendiz.APREN_Celular = cel
+                            aprendiz.save()        
+
+                #Se borran las filas por medio de sus indices y se guarda en un nuevo DataFrame
+                datos_completos = datos2.drop(lista, axis=0)
+                
+                #Se borra la carpeta donde se encuentra el Excel debido a que ya hizo la lectura
+                rmtree("ProyectoSennova/media/Importar")  
+                #Se guardan los datos del DataFrame en la Base de Datos          
+                datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
+            except:
+                return redirect('/aprendiz')
+
         else:
             usuario = request.user
             return render(request, 'aprendiz/import.html', {'usuario' : usuario})
@@ -1490,127 +1503,139 @@ def importarContrato(request):
             #Se crea el motor
             engine = create_engine('mysql://root@localhost/ProyectoEtapa')
 
-            #Se hace la lectura del documento y se eliminan las columnas que no se necesitan 
-            datos = pd.read_excel(io = url,  sheet_name=0, header=0, names=['TIPODOCUMENTO', 'APREN_Documento', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'CONT_Estado_Aprendiz', 'MOTIVO', 'FECHA1','FICHA', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'CONT_Fecha_Creacion', 'NIT', 'EMPRESA', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion', 'CONT_Estado_Contrato'], parse_dates=['CONT_Fecha_Creacion', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion'], index_col=None)
-            datos2 = datos.drop(['TIPODOCUMENTO', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'MOTIVO', 'FECHA1', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'NIT', 'EMPRESA'], axis=1).fillna(value='vacio')
+            #Se hace una lectura de prueba para verificar el numero de columnas y con eso verificar que el documento sea el correcto
+            prueba = pd.read_excel(io = url, sheet_name=0, header=4)
+            columnas =  len(prueba.columns)   
+            if columnas == 22:
+                pass
+            else:
+                mensaje = 'El documento no es el correcto. Por favor verifique y vuelva a intentarlo.'
+                return render(request, 'aprendiz/import.html', {'mensaje' : mensaje})
 
-            #Se añaden las columnas de las foraneas
-            datos2.insert(7, "aprendiz_id", 1, allow_duplicates=True)
-            datos2.insert(8, "empresa_id", 1, allow_duplicates=True)
-            
-            #Se crea una lista para guradr el indice de los datos que ya estan guardados
-            lista = []
-            
-            for i in range(0, len(datos2)):
+            try:
+
+                #Se hace la lectura del documento y se eliminan las columnas que no se necesitan 
+                datos = pd.read_excel(io = url,  sheet_name=0, header=0, names=['TIPODOCUMENTO', 'APREN_Documento', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'CONT_Estado_Aprendiz', 'MOTIVO', 'FECHA1','FICHA', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'CONT_Fecha_Creacion', 'NIT', 'EMPRESA', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion', 'CONT_Estado_Contrato'], parse_dates=['CONT_Fecha_Creacion', 'CONT_Fecha_inicio', 'CONT_Fecha_Terminacion'], index_col=None)
+                datos2 = datos.drop(['TIPODOCUMENTO', 'APELLIDOS', 'NOMBRES', 'DIRECCION', 'CIUDAD', 'MOTIVO', 'FECHA1', 'CODIGO', 'CENTRO', 'ESPECIALIDAD', 'FECHA2', 'FECHA3', 'REGIONAL', 'NIT', 'EMPRESA'], axis=1).fillna(value='vacio')
+
+                #Se añaden las columnas de las foraneas
+                datos2.insert(7, "aprendiz_id", 1, allow_duplicates=True)
+                datos2.insert(8, "empresa_id", 1, allow_duplicates=True)
                 
-                #Buscamos algunos datos para su posterios comparacion
-                busq_ficha = datos2.loc[i,'FICHA']
-                num = datos2.iloc[i]['APREN_Documento']  
-                busq_empresa = datos.loc[i, 'NIT']
-                est_aprendiz = datos2.loc[i, 'CONT_Estado_Aprendiz']
-                est_contrato = datos2.loc[i, 'CONT_Estado_Contrato']
-                fec_inicio = datos2.loc[i, 'CONT_Fecha_inicio']
-                fec_final = datos2.loc[i, 'CONT_Fecha_Terminacion']
+                #Se crea una lista para guradr el indice de los datos que ya estan guardados
+                lista = []
+                
+                for i in range(0, len(datos2)):
+                    
+                    #Buscamos algunos datos para su posterios comparacion
+                    busq_ficha = datos2.loc[i,'FICHA']
+                    num = datos2.iloc[i]['APREN_Documento']  
+                    busq_empresa = datos.loc[i, 'NIT']
+                    est_aprendiz = datos2.loc[i, 'CONT_Estado_Aprendiz']
+                    est_contrato = datos2.loc[i, 'CONT_Estado_Contrato']
+                    fec_inicio = datos2.loc[i, 'CONT_Fecha_inicio']
+                    fec_final = datos2.loc[i, 'CONT_Fecha_Terminacion']
 
 
-                #Verificamos si tiene un estado de Aprendiz diferente para guardar los datos faltantes
-                if est_aprendiz.strip() != 'Contratado' and est_aprendiz.strip() != 'Final Contrato':
-                    datos2.loc[i, 'CONT_Estado_Contrato'] = 'SIN CONTRATO'
-                    datos2.loc[i, 'CONT_Fecha_inicio'] = date.today()
-                    datos2.loc[i, 'CONT_Fecha_Terminacion'] = date.today()
+                    #Verificamos si tiene un estado de Aprendiz diferente para guardar los datos faltantes
+                    if est_aprendiz.strip() != 'Contratado' and est_aprendiz.strip() != 'Final Contrato':
+                        datos2.loc[i, 'CONT_Estado_Contrato'] = 'SIN CONTRATO'
+                        datos2.loc[i, 'CONT_Fecha_inicio'] = date.today()
+                        datos2.loc[i, 'CONT_Fecha_Terminacion'] = date.today()
 
-                #Buscamos la ficha en la base y la creamos en caso de que no este
-                if Ficha.objects.filter(FICHA_Identificador_Unico = busq_ficha):
-                    ficha_busq = Ficha.objects.get(FICHA_Identificador_Unico = busq_ficha)
-                else:
-                    new_ficha = Ficha(
-                        FICHA_Identificador_Unico = busq_ficha,
-                        FICHA_Fecha_Inicio = date.today(),
-                        FICHA_Fecha_Terminacion = date.today(),
-                        FICHA_Actualizacion_Carga = date.today(),
-                        FICHA_Etapa = 'Por definir',
-                        FICHA_Nombre_Responsable = 'Por definir',
-                        jornada = Jornada(id = 1),
-                        programaformacion = ProgramaFormacion(id = 1),
-                        centro = Centro(id = 1)                             #Los ID de las claves foreanes son hechas desde la base de datos 
-                    )
-                    new_ficha.save()
+                    #Buscamos la ficha en la base y la creamos en caso de que no este
+                    if Ficha.objects.filter(FICHA_Identificador_Unico = busq_ficha):
+                        ficha_busq = Ficha.objects.get(FICHA_Identificador_Unico = busq_ficha)
+                    else:
+                        new_ficha = Ficha(
+                            FICHA_Identificador_Unico = busq_ficha,
+                            FICHA_Fecha_Inicio = date.today(),
+                            FICHA_Fecha_Terminacion = date.today(),
+                            FICHA_Actualizacion_Carga = date.today(),
+                            FICHA_Etapa = 'Por definir',
+                            FICHA_Nombre_Responsable = 'Por definir',
+                            jornada = Jornada(id = 1),
+                            programaformacion = ProgramaFormacion(id = 1),
+                            centro = Centro(id = 1)                             #Los ID de las claves foreanes son hechas desde la base de datos 
+                        )
+                        new_ficha.save()
 
-                #Buscamos si ya existe la empresa y se guarda si ID en el Excel
-                if Empresa.objects.filter(EMPRE_Identificacion = busq_empresa):
-                    empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
-                    datos2.loc[i, 'empresa_id'] = empresa.id
-                else:
-                    #Si no encuentra la empresa crea una
-                    empresa = Empresa(
-                        EMPRE_Tipo_Identificacion = 'NIT',
-                        EMPRE_Nombre = datos.loc[i, 'EMPRESA'],
-                        EMPRE_Identificacion = datos.loc[i, 'NIT']
-                    )
-                    empresa.save()
-                    datos2.loc[i, 'empresa_id'] = empresa.id
+                    #Buscamos si ya existe la empresa y se guarda si ID en el Excel
+                    if Empresa.objects.filter(EMPRE_Identificacion = busq_empresa):
+                        empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
+                        datos2.loc[i, 'empresa_id'] = empresa.id
+                    else:
+                        #Si no encuentra la empresa crea una
+                        empresa = Empresa(
+                            EMPRE_Tipo_Identificacion = 'NIT',
+                            EMPRE_Nombre = datos.loc[i, 'EMPRESA'],
+                            EMPRE_Identificacion = datos.loc[i, 'NIT']
+                        )
+                        empresa.save()
+                        datos2.loc[i, 'empresa_id'] = empresa.id
 
 
 
-                #Buscamos el aprendiz en la base de datos
-                if Aprendiz.objects.filter(APREN_Documento = num):
-                    aprendiz = Aprendiz.objects.get(APREN_Documento = num)
-                    datos2.loc[i,'aprendiz_id'] = aprendiz.id
+                    #Buscamos el aprendiz en la base de datos
+                    if Aprendiz.objects.filter(APREN_Documento = num):
+                        aprendiz = Aprendiz.objects.get(APREN_Documento = num)
+                        datos2.loc[i,'aprendiz_id'] = aprendiz.id
 
-                    #Buscamos si ya existe un contrato asociado a ese aprendiz
-                    if Contrato.objects.filter(aprendiz = aprendiz.id):
-                        for u in Contrato.objects.filter(aprendiz = aprendiz.id):
-                            #contrato = Contrato.objects.get(aprendiz = aprendiz.id)
-                            lista.append(i)
+                        #Buscamos si ya existe un contrato asociado a ese aprendiz
+                        if Contrato.objects.filter(aprendiz = aprendiz.id):
+                            for u in Contrato.objects.filter(aprendiz = aprendiz.id):
+                                #contrato = Contrato.objects.get(aprendiz = aprendiz.id)
+                                lista.append(i)
 
-                            #Se comparan todos los datos y si hay algun cambio se actualiza
-                            if u.CONT_Estado_Aprendiz != est_aprendiz:
-                                u.CONT_Estado_Aprendiz = est_aprendiz
-                                u.save() 
+                                #Se comparan todos los datos y si hay algun cambio se actualiza
+                                if u.CONT_Estado_Aprendiz != est_aprendiz:
+                                    u.CONT_Estado_Aprendiz = est_aprendiz
+                                    u.save() 
 
-                            if u.CONT_Estado_Contrato != est_contrato and est_contrato != 'vacio':
-                                u.CONT_Estado_Contrato = est_contrato
-                                u.save()  
+                                if u.CONT_Estado_Contrato != est_contrato and est_contrato != 'vacio':
+                                    u.CONT_Estado_Contrato = est_contrato
+                                    u.save()  
 
-                            if u.CONT_Fecha_Inicio != fec_inicio and fec_inicio != 'vacio':
-                                u.CONT_Fecha_Inicio = fec_inicio
-                                u.save()
+                                if u.CONT_Fecha_Inicio != fec_inicio and fec_inicio != 'vacio':
+                                    u.CONT_Fecha_Inicio = fec_inicio
+                                    u.save()
 
-                            if u.CONT_Fecha_Terminacion != fec_final and fec_final != 'vacio': 
-                                u.CONT_Fecha_Terminacion = fec_final
-                                u.save()    
+                                if u.CONT_Fecha_Terminacion != fec_final and fec_final != 'vacio': 
+                                    u.CONT_Fecha_Terminacion = fec_final
+                                    u.save()    
 
-                            if u.empresa.EMPRE_Identificacion != busq_empresa:
-                                u.empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
-                                u.save()
-                else:
-                    #Si no encuentra el Aprendiz se crea uno con los datos del Excel
-                    aprendiz = Aprendiz(
-                        APREN_Nombre = datos.loc[i, 'NOMBRES'],
-                        APREN_Apellido = datos.loc[i, 'APELLIDOS'],
-                        APREN_Documento = datos.loc[i, 'APREN_Documento'],
-                        APREN_Tipo_Documento = datos.loc[i, 'TIPODOCUMENTO'],
-                        APREN_Celular = 'Por definir',
-                        APREN_Estado = 'Por definir',
-                        APREN_Correo = 'Por definir',
-                        APREN_Foto = 'Aprendiz/user.jpg',
-                        ficha = Ficha.objects.get(FICHA_Identificador_Unico = busq_ficha)
-                    )
-                    aprendiz.save()                         
-                    datos2.loc[i,'aprendiz_id'] = aprendiz.id
+                                if u.empresa.EMPRE_Identificacion != busq_empresa:
+                                    u.empresa = Empresa.objects.get(EMPRE_Identificacion = busq_empresa)
+                                    u.save()
+                    else:
+                        #Si no encuentra el Aprendiz se crea uno con los datos del Excel
+                        aprendiz = Aprendiz(
+                            APREN_Nombre = datos.loc[i, 'NOMBRES'],
+                            APREN_Apellido = datos.loc[i, 'APELLIDOS'],
+                            APREN_Documento = datos.loc[i, 'APREN_Documento'],
+                            APREN_Tipo_Documento = datos.loc[i, 'TIPODOCUMENTO'],
+                            APREN_Celular = 'Por definir',
+                            APREN_Estado = 'Por definir',
+                            APREN_Correo = 'Por definir',
+                            APREN_Foto = 'Aprendiz/user.jpg',
+                            ficha = Ficha.objects.get(FICHA_Identificador_Unico = busq_ficha)
+                        )
+                        aprendiz.save()                         
+                        datos2.loc[i,'aprendiz_id'] = aprendiz.id
 
-            #Eliminamos las columnas que ya no sirven
-            datos3 = datos2.drop(['APREN_Documento', 'FICHA'], axis=1)
+                #Eliminamos las columnas que ya no sirven
+                datos3 = datos2.drop(['APREN_Documento', 'FICHA'], axis=1)
 
-            #Eliminamos las filas con los datos que ya estan registrados
-            datos_completos = datos3.drop(lista, axis=0)
-            
-            #Eliminamos la carpeta donde se almacenan los archivos
-            rmtree("ProyectoSennova/media/Importar")  
+                #Eliminamos las filas con los datos que ya estan registrados
+                datos_completos = datos3.drop(lista, axis=0)
+                
+                #Eliminamos la carpeta donde se almacenan los archivos
+                rmtree("ProyectoSennova/media/Importar")  
 
-            #Se gurdan los datos en la Base de datos        
-            datos_completos.to_sql(name = 'Contrato', con = engine, if_exists = 'append', index=False)
-
+                #Se gurdan los datos en la Base de datos        
+                datos_completos.to_sql(name = 'Contrato', con = engine, if_exists = 'append', index=False)
+            except:
+                return redirect('/contrato')
         else:
             #Se retorna una vista
             usuario = request.user
@@ -1656,14 +1681,18 @@ def insertUsuario(request):
             request.POST.get('email'),
             request.POST.get('password')
         )
-        user.last_name = request.POST['last_name'],
-        user.first_name = request.POST['first_name'],
-        return redirect('/index')
+        user.last_name = request.POST['last_name']
+        user.first_name = request.POST['first_name']
+        user.role = 1
+        user.save() 
+        
+        login(request, user)
+        return redirect('/index')  
     else:
         return render(request, "Usuario/insert.html")
 
 
-def loginUsuario(request):
+def loginUsuario(request):   
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -1682,11 +1711,6 @@ def loginUsuario(request):
 def logoutUsuario(request):
     logout(request)
     return redirect('/accounts/login')
-
-
-def usuarioSession(request):
-    usuario = request.user
-    return usuario
 
 
 def viewIndex(request):
