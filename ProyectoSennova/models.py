@@ -1,7 +1,8 @@
 from pyexpat import model
 from tkinter import CASCADE
-from django.db import connection, models
+from django.db import connection, models, migrations
 from django.contrib.auth.models import AbstractUser
+
 
 class User(AbstractUser):
     INSTRUCTOR = 1
@@ -12,7 +13,7 @@ class User(AbstractUser):
       (ADMINISTRADOR, 'Administrador'),
     )    
     foto = models.ImageField(upload_to='User/', blank=True, null=True, default='User/user.jpg')
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True, default=1)
 
 
 class PaisCurso(models.Model):
@@ -46,6 +47,9 @@ class MunicipioCurso(models.Model):
 
 class Regional(models.Model):
     REGIO_Nombre = models.CharField(max_length=100)
+
+    migrations.RunSQL('INSERT INTO `Regional`(`id`, `REGIO_Nombre`) VALUES (1, "None");')
+
     class Meta:
         db_table = 'Regional'
     
@@ -54,6 +58,9 @@ class Regional(models.Model):
 class Sector(models.Model):
     SECTO_Nombre = models.CharField(max_length=100)
     SECTO_NombreNuevo = models.CharField(max_length=100)
+
+    migrations.RunSQL('INSERT INTO `Sector`(`id`, `SECTO_Nombre`, `SECTO_NombreNuevo`) VALUES (1, "None", "None");')
+
     class Meta:
         db_table = 'Sector'
 
@@ -61,6 +68,9 @@ class Sector(models.Model):
 
 class Jornada(models.Model):
     JORNA_Nombre = models.CharField(max_length=100)
+
+    migrations.RunSQL('INSERT INTO `Jornada`(`id`, `JORNA_Nombre`) VALUES (1, "None");')
+
     class Meta:
         db_table = 'Jornada'
 
@@ -81,6 +91,9 @@ class Centro(models.Model):
         Regional,
         on_delete = models.CASCADE
     )
+
+    migrations.RunSQL('INSERT INTO `Centro`(`id`, `CENTR_Nombre`, `regional_id`) VALUES (1, "None", 1);')
+
     class Meta:
         db_table = 'Centro'
 
@@ -98,6 +111,9 @@ class ProgramaFormacion(models.Model):
         Sector,
         on_delete = models.CASCADE
     )
+
+    migrations.RunSQL('INSERT INTO Programa_Formacion(`id`, `PROGR_Nombre`, `PROGR_Modalidad`, `PROGR_Tipo_Formacion`, `PROGR_Duracion`, `PROGR_Version`, `PROGR_Nivel`, `PROGR_URL`,  `sector_id`) VALUES (1, "None", "None", "None", "None", "None", "None", "None", 1);')
+
     class Meta:
         db_table = 'Programa_Formacion'
 

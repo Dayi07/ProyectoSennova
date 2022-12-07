@@ -1318,11 +1318,31 @@ def importarAprendiz(request):
                 busq = datos.loc[0,'APREN_Nombre']
                 busq.split()
                 ficha = re.split(r'\s+', busq)
+                busq_programa = busq.split(sep='- ') 
+                print('BUUUUUUUUUUUSQUEDA' , busq_programa[1])
+
+                #Buscamos se ya esta registrado el Programa de Formacion, en caso que no se crea
+                if ProgramaFormacion.objects.filter(PROGR_Nombre = busq_programa[1]):
+                    programa = ProgramaFormacion.objects.get(PROGR_Nombre = busq_programa[1])
+                else:
+                    new_prog = ProgramaFormacion(
+                        PROGR_Nombre = busq_programa[1],
+                        PROGR_Modalidad = 'Por definir',
+                        PROGR_Tipo_Formacion = 'Por definir',
+                        PROGR_Duracion = 'Por definir',
+                        PROGR_Version = 'Por definir',
+                        PROGR_Nivel = 'Por definir',
+                        PROGR_URL = 'Por definir',
+                        sector = Sector.objects.get(id = 1)
+                    )
+                    new_prog.save()
 
 
                 #Se busca en la clase la Ficha capturada si ya esta registrada se captura, si no esta registrada se guarda
                 if Ficha.objects.filter(FICHA_Identificador_Unico = ficha[0]):
                     ficha_def = Ficha.objects.get(FICHA_Identificador_Unico = ficha[0])
+                    ficha_def.programaformacion = ProgramaFormacion.objects.get(PROGR_Nombre = busq_programa[1])
+                    ficha_def.save()
                 else:
                     new_ficha = Ficha(
                         FICHA_Identificador_Unico = ficha[0],
@@ -1332,15 +1352,17 @@ def importarAprendiz(request):
                         FICHA_Etapa = 'Por definir',
                         FICHA_Nombre_Responsable = 'Por definir',
                         jornada = Jornada(id = 1),
-                        programaformacion = ProgramaFormacion(id = 1),
+                        programaformacion = ProgramaFormacion.objects.get(PROGR_Nombre = busq_programa[1]),
                         centro = Centro(id = 1)
                     )
                     new_ficha.save()
                     ficha_def = new_ficha
 
+
                 #Se guarda la fecha de Actualizacion en la ficha
                 ficha_def.FICHA_Actualizacion_Carga = date.today()
                 ficha_def.save()
+                print('FICHAAAAAAAAAA', ficha_def)
 
                 #Se inserta una nueva columna con el Id de la Ficha
                 datos2.insert(7, "ficha_id", ficha_def.id, allow_duplicates=False)
@@ -1368,6 +1390,7 @@ def importarAprendiz(request):
                         if aprendiz.APREN_Correo != cor:
                             aprendiz.APREN_Correo = cor
                             aprendiz.save()
+
                         if aprendiz.APREN_Celular != cel:
                             aprendiz.APREN_Celular = cel
                             aprendiz.save()        
@@ -1381,7 +1404,6 @@ def importarAprendiz(request):
                 datos_completos.to_sql(name = 'Aprendiz', con = engine, if_exists = 'append', index=False)
             except:
                 return redirect('/aprendiz')
-
         else:
             usuario = request.user
             return render(request, 'aprendiz/import.html', {'usuario' : usuario})
@@ -1439,16 +1461,32 @@ def insertContrato(request):
 
 
 @login_required(redirect_field_name='')
-def viewContrato(request):
+def viewContrato(request, id):
     if not request.user.is_authenticated:  
         return redirect('/usuario/login')
 
-    contrato = Contrato.objects.select_related('empresa').select_related('aprendiz')
-    archivo = open("ProyectoSennova/Templates/Contrato/view.html")
+    contrato = Contrato.objects.filter(empresa = id)
+    empresa = Empresa.objects.get(id = id)
+    archivo = open("ProyectoSennova/Templates/Contrato/view_con.html")
     leer = Template(archivo.read())
     archivo.close
     usuario = request.user
-    parametros = Context({'contrato' : contrato, 'usuario' : usuario})
+    parametros = Context({'contrato' : contrato, 'usuario' : usuario, 'empresa' : empresa})
+    paginalistado = leer.render(parametros)
+    return HttpResponse(paginalistado)
+
+
+@login_required(redirect_field_name='')
+def view_emp_Contrato(request):
+    if not request.user.is_authenticated:  
+        return redirect('/usuario/login')
+
+    empresa = Empresa.objects.all()
+    archivo = open("ProyectoSennova/Templates/Contrato/view_emp.html")
+    leer = Template(archivo.read())
+    archivo.close
+    usuario = request.user
+    parametros = Context({'usuario' : usuario, 'empresa' : empresa})
     paginalistado = leer.render(parametros)
     return HttpResponse(paginalistado)
 

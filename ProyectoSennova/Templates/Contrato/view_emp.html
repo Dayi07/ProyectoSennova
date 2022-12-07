@@ -1,0 +1,89 @@
+{% include 'Inc/header.html' %}
+                      <h2 class="content-header-title float-start mb-0">Contrato</h2>
+                        <div class="breadcrumb-wrapper">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/contrato">Empresas</a>
+                                </li>
+                                {% if usuario.role == 2 %}
+                                <li class="breadcrumb-item"><a href="/contrato/insert/">Insertar contrato</a>
+                                </li>
+                                <li class="breadcrumb-item"><a href="/contrato/import/">Importar contrato</a>
+                                </li>
+                                {% endif %}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-header-right text-md-end col-md-3 col-12 d-md-block d-none">
+                <div class="mb-1 breadcrumb-right">
+                    <div class="dropdown">
+                        <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i data-feather="grid"></i></button>
+                        <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#"><i class="me-1" data-feather="check-square"></i><span class="align-middle">Todo</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="message-square"></i><span class="align-middle">Chat</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="mail"></i><span class="align-middle">Email</span></a><a class="dropdown-item" href="#"><i class="me-1" data-feather="calendar"></i><span class="align-middle">Calendar</span></a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content-body">
+            <section id="basic-datatable">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <table class="datatables-basic table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Nombre</th>
+                                        <th>Identificacion</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in empresa %}
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            <a href="{% url 'viewContratos' item.id %}">
+                                                {{ item.EMPRE_Nombre }}
+                                            </a>
+                                        </td>
+                                        <td>{{ item.EMPRE_Tipo_Identificacion }} {{ item.EMPRE_Identificacion }}</td>
+                                       
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+{% include 'Inc/footer.html' %}
+
+<script>
+    function borrar(id){   
+    swal({
+            title: "Estas seguro de eliminar?",
+            text: "Si eliminas este elemento no podra ser recuperado",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            
+        .then((willDelete) => {
+                       
+            if (willDelete) {
+                var url2 = "delete/" + id;
+                url2 = url2.replace('id', id);
+                location.href = url2;   
+
+            
+                swal("Poof! El elemento fue eliminado!", {
+                icon: "success",
+                });    
+            
+            } else {
+                swal("El elemento no se elimino");
+            }
+        });   
+    }   
+</script>

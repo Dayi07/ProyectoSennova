@@ -33,9 +33,9 @@ from ProyectoSennova.views import insertCurso, viewCurso, deleteCurso, viewUpdat
 from ProyectoSennova.views import insertHora, viewHora, deleteHora, viewUpdateHoras                                                                               #HORA
 from ProyectoSennova.views import insertProgEsp, viewProgEsp, deleteProgEsp, viewUpdateProgEsp                                                                    #PROGRAMA ESPECIAL
 from ProyectoSennova.views import insertProgFor, viewProgFor, deleteProgFor, viewUpdateProgFor, viewUpdateFileProgFor, viewDetallesProgFor                        #PROGRAMA FORMACION
-from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetallesFicha, reporteFicha                                                         #FICHA
+from ProyectoSennova.views import insertFicha, viewFicha, deleteFicha, viewUpdateFicha, viewDetallesFicha, reporteFicha                                           #FICHA
 from ProyectoSennova.views import insertAprendiz, viewAprendiz, deleteAprendiz, viewUpdateAprendiz, importarAprendiz, updateFotoAprendiz, viewDetallesAprendiz    #APRENDIZ
-from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato, viewDetallesContrato                        #Contrato
+from ProyectoSennova.views import insertContrato, viewContrato, deleteContrato, viewUpdateContrato, importarContrato, viewDetallesContrato, view_emp_Contrato     #Contrato
 from ProyectoSennova.views import insertUsuario, loginUsuario, logoutUsuario, viewIndex, viewPerfil, updateFotoUsuario
 
 
@@ -132,7 +132,8 @@ urlpatterns = [
     path('aprendiz/detalles/<int:id>', viewDetallesAprendiz, name='viewDetallesAprendiz'),
 
     path('contrato/insert/', insertContrato),
-    path('contrato/', viewContrato),
+    path('contrato/<int:id>', viewContrato, name='viewContratos'),  
+    path('contrato/', view_emp_Contrato),
     path('contrato/delete/<int:id>', deleteContrato, name='deleteContrato'),
     path('contrato/update/<int:id>', viewUpdateContrato, name='updateContrato'),
     path('contrato/import/', importarContrato, name='importarContrato'),
